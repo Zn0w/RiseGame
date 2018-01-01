@@ -1,7 +1,7 @@
 #include "rendering.h"
 
 // Draws a single entity
-void draw(Entity entity);
+void draw(Entity* entity);
 
 void init(GLFWwindow* window)
 {
@@ -19,20 +19,20 @@ void clearScreen()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void render(std::vector<Entity> entities)
+void render(std::vector<Entity*> entities)
 {
-	for (Entity entity : entities)
-		if (entity.active)
+	for (Entity* entity : entities)
+		if (entity->active)
 			draw(entity);
 }
 
-void draw(Entity entity)
+void draw(Entity* entity)
 {
 	glBegin(GL_QUADS);
 	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2i(entity.x, entity.y);
-	glVertex2i(entity.x + entity.width, entity.y);
-	glVertex2i(entity.x + entity.width, entity.y + entity.height);
-	glVertex2i(entity.x, entity.y + entity.height);
+	glVertex2i(entity->x, entity->y);
+	glVertex2i(entity->x + entity->width, entity->y);
+	glVertex2i(entity->x + entity->width, entity->y + entity->height);
+	glVertex2i(entity->x, entity->y + entity->height);
 	glEnd();
 }

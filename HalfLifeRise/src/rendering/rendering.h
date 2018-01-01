@@ -13,4 +13,4 @@ void init(GLFWwindow* window);
 void clearScreen();
 
 // Renders game entities
-void render(std::vector<Entity> entities);
+void render(std::vector<Entity*> entities);

@@ -2,7 +2,7 @@
 
 struct Entity
 {
-	int x, y, width, height;
+	int x, y, width, height, ground_pos;
 	bool active;
 
 	Entity(int xpos, int ypos, int w, int h)
