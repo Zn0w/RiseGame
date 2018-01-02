@@ -4,7 +4,7 @@
 
 #include "GLFW/glfw3.h"
 
-#include "../entities/Entity.h"
+#include "../entities/entity.h"
 
 // Initializes an opengl and sets glOrigin to the top left corner
 void init(GLFWwindow* window);

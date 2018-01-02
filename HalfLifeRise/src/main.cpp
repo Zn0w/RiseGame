@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "rendering\rendering.h"
+#include "entities/player.h"
 
 int main()
 {
@@ -26,21 +27,16 @@ int main()
 	// Init a game world entities
 	std::vector<Entity*> entities;
 	
-	Entity* player = new Entity(50, 70, 80, 80);
-	entities.push_back(player);
+	Entity player(50, 70, 80, 80);
+	entities.push_back(&player);
+
+	Entity wall(150, 40, 80, 40);
+	entities.push_back(&wall);
 
 	init(window);
 	while (!glfwWindowShouldClose(window))
 	{
-		// Player entity input handling
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			player->x += 1;
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			player->x -= 1;
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && player->ground_pos == player->y + player->height)
-			std::cout << "Key E is pressed!\n";
-		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			std::cout << "Key E is pressed!\n";
+		player::update(&player, window, wall);
 		
 		clearScreen();
 
