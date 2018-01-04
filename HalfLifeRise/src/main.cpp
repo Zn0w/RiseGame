@@ -69,6 +69,6 @@ void update()
 	for (Entity* entity : entities)
 	{
 		if (entity->type == Player)
-			player::update(entity, window);
+			player::update(entity, window, entities);
 	}
 }
