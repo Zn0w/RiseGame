@@ -10,12 +10,11 @@ void init();
 void draw();
 void update();
 
-std::vector<Entity> entities;
+std::vector<Entity*> entities;
+GLFWwindow* window;
 
 int main()
 {
-	GLFWwindow* window;
-
 	/* Initialize the library */
 	if (!glfwInit())
 		return -1;
@@ -31,7 +30,6 @@ int main()
 	glfwMakeContextCurrent(window);
 
 	// Game init
-	rendering::init(window);
 	init();
 
 	while (!glfwWindowShouldClose(window))
@@ -49,22 +47,28 @@ int main()
 
 void init()
 {
-	Entity player(50, 70, 80, 80, true, Player);
+	rendering::init(window);
+	
+	Entity* player = new Entity(50, 70, 80, 80, true, Player);
 	entities.push_back(player);
 
-	Entity wall(150, 40, 80, 40, true, Static_Object);
+	Entity* wall = new Entity(150, 40, 80, 40, true, Static_Object);
 	entities.push_back(wall);
 }
 
 void draw()
 {
 	rendering::clearScreen();
-	for (Entity entity : entities)
-		if (entity.active)
-			rendering::render(entity);
+	for (Entity* entity : entities)
+		if (entity->active)
+			rendering::render(*entity);
 }
 
 void update()
 {
-	//player update
+	for (Entity* entity : entities)
+	{
+		if (entity->type == Player)
+			player::update(entity, window);
+	}
 }

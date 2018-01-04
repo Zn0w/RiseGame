@@ -9,5 +9,5 @@
 namespace player
 {
 	// Input handling, collision detection of player
-	void update(Entity* player, GLFWwindow* window, Entity wall);
+	void update(Entity* player, GLFWwindow* window);
 }
