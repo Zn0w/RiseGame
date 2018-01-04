@@ -1,8 +1,5 @@
 #include "rendering.h"
 
-// Draws a single entity
-void draw(Entity* entity);
-
 void init(GLFWwindow* window)
 {
 	int width, height;
@@ -19,14 +16,7 @@ void clearScreen()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void render(std::vector<Entity*> entities)
-{
-	for (Entity* entity : entities)
-		if (entity->active)
-			draw(entity);
-}
-
-void draw(Entity* entity)
+void render(Entity entity)
 {
 	glBegin(GL_QUADS);
 	glColor3f(1.0f, 0.0f, 0.0f);

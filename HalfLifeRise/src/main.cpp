@@ -6,6 +6,12 @@
 #include "rendering\rendering.h"
 #include "entities/player.h"
 
+void init();
+void draw();
+void update();
+
+std::vector<Entity> entities;
+
 int main()
 {
 	GLFWwindow* window;
@@ -24,23 +30,14 @@ int main()
 
 	glfwMakeContextCurrent(window);
 
-	// Init a game world entities
-	std::vector<Entity*> entities;
-	
-	Entity player(50, 70, 80, 80);
-	entities.push_back(&player);
-
-	Entity wall(150, 40, 80, 40);
-	entities.push_back(&wall);
-
+	// Game init
 	init(window);
-	while (!glfwWindowShouldClose(window))
-	{
-		player::update(&player, window, wall);
-		
-		clearScreen();
+	init();
 
-		render(entities);
+	while (!glfwWindowShouldClose(window))
+	{	
+		update();
+		draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -48,4 +45,26 @@ int main()
 
 	glfwTerminate();
 	return 0;
+}
+
+void init()
+{
+	Entity player(50, 70, 80, 80, true);
+	entities.push_back(player);
+
+	Entity wall(150, 40, 80, 40, true);
+	entities.push_back(wall);
+}
+
+void draw()
+{
+	clearScreen();
+	for (Entity entity : entities)
+		if (entity.active)
+			render(entity);
+}
+
+void update()
+{
+	//player update
 }

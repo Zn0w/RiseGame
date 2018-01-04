@@ -23,7 +23,7 @@ namespace player
 			std::cout << "Top!";*/
 	}
 
-	bool top(Entity player, Entity otherEntity)
+	bool top(Entity player, Entity otherEntity) // Implement full function due to refactoring!
 	{
 		return player.y <= otherEntity.y + otherEntity.height &&
 			player.y + player.height >= otherEntity.y + otherEntity.height &&

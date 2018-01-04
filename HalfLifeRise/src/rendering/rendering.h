@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "GLFW/glfw3.h"
 
 #include "../entities/entity.h"
@@ -13,4 +11,4 @@ void init(GLFWwindow* window);
 void clearScreen();
 
 // Renders game entities
-void render(std::vector<Entity*> entities);
+void render(Entity entity);
