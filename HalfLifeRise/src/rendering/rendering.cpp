@@ -20,9 +20,9 @@ void render(Entity entity)
 {
 	glBegin(GL_QUADS);
 	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2i(entity->x, entity->y);
-	glVertex2i(entity->x + entity->width, entity->y);
-	glVertex2i(entity->x + entity->width, entity->y + entity->height);
-	glVertex2i(entity->x, entity->y + entity->height);
+	glVertex2i(entity.x, entity.y);
+	glVertex2i(entity.x + entity.width, entity.y);
+	glVertex2i(entity.x + entity.width, entity.y + entity.height);
+	glVertex2i(entity.x, entity.y + entity.height);
 	glEnd();
 }

@@ -31,7 +31,7 @@ int main()
 	glfwMakeContextCurrent(window);
 
 	// Game init
-	init(window);
+	rendering::init(window);
 	init();
 
 	while (!glfwWindowShouldClose(window))
@@ -58,10 +58,10 @@ void init()
 
 void draw()
 {
-	clearScreen();
+	rendering::clearScreen();
 	for (Entity entity : entities)
 		if (entity.active)
-			render(entity);
+			rendering::render(entity);
 }
 
 void update()
