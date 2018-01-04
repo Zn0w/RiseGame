@@ -49,10 +49,10 @@ int main()
 
 void init()
 {
-	Entity player(50, 70, 80, 80, true);
+	Entity player(50, 70, 80, 80, true, Player);
 	entities.push_back(player);
 
-	Entity wall(150, 40, 80, 40, true);
+	Entity wall(150, 40, 80, 40, true, Static_Object);
 	entities.push_back(wall);
 }
 
