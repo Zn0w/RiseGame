@@ -16,8 +16,9 @@ namespace player
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			player->y += 1;
 		
-		for (Entity* entity : entities)
+		// To refactor!
+		/*for (Entity* entity : entities)
 			if (entity->type == Static_Object && collision::isColliding(player, entity))
-				std::cout << "Player is hitting static object\n";
+				std::cout << "Player is hitting static object\n";*/
 	}
 }

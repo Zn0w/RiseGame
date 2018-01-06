@@ -52,7 +52,7 @@ void init()
 	Entity* player = new Entity(50, 70, 80, 80, true, Player);
 	entities.push_back(player);
 
-	Entity* wall = new Entity(150, 40, 80, 40, true, Static_Object);
+	Entity* wall = new Entity(150, 40, 80, 40, true, Object);
 	entities.push_back(wall);
 }
 
