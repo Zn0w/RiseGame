@@ -20,7 +20,7 @@ int main()
 		return -1;
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(1280, 720, "Hello World", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -32,8 +32,20 @@ int main()
 	// Game init
 	init();
 
+	double previous_time = glfwGetTime();
+	int frame_count = 0;
+
 	while (!glfwWindowShouldClose(window))
 	{	
+		double current_time = glfwGetTime();
+		frame_count++;
+		if (current_time - previous_time >= 1.0)
+		{
+			std::cout << "FPS: " << /*1000.0 / */frame_count << std::endl;
+			frame_count = 0;
+			previous_time += 1.0;
+		}
+		
 		update();
 		draw();
 
