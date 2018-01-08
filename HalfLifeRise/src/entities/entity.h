@@ -3,9 +3,7 @@
 enum EntityType
 {
 	Player,
-	Zombie,
-	Airy,
-	Gunner,
+	Enemy,
 	Object
 };
 
