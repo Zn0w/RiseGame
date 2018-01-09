@@ -10,6 +10,8 @@ void init();
 void draw();
 void update();
 
+void glfwWindowResize(GLFWwindow* window, int width, int height);
+
 std::vector<Entity*> entities;
 GLFWwindow* window;
 
@@ -20,7 +22,7 @@ int main()
 		return -1;
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(1280, 720, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -28,6 +30,7 @@ int main()
 	}
 
 	glfwMakeContextCurrent(window);
+	glfwSetWindowSizeCallback(window, glfwWindowResize);
 
 	// Game init
 	init();
@@ -41,10 +44,14 @@ int main()
 		frame_count++;
 		if (current_time - previous_time >= 1.0)
 		{
-			std::cout << "FPS: " << /*1000.0 / */frame_count << std::endl;
+			std::cout << "FPS: " << frame_count << std::endl;
 			frame_count = 0;
 			previous_time += 1.0;
 		}
+		
+		//int width, height;
+		//glfwGetFramebufferSize(window, &width, &height);
+		//glViewport(0, 0, width, height);
 		
 		update();
 		draw();
@@ -83,4 +90,9 @@ void update()
 		if (entity->type == Player)
 			player::update(entity, window, entities);
 	}
+}
+
+void glfwWindowResize(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
 }
