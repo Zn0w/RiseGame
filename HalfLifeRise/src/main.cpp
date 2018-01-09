@@ -8,7 +8,7 @@
 
 void init();
 void draw();
-void update();
+void update(double delta);
 
 void glfwWindowResize(GLFWwindow* window, int width, int height);
 
@@ -36,24 +36,16 @@ int main()
 	init();
 
 	double previous_time = glfwGetTime();
-	int frame_count = 0;
+	double current_time;
+	double delta;
 
 	while (!glfwWindowShouldClose(window))
 	{	
-		double current_time = glfwGetTime();
-		frame_count++;
-		if (current_time - previous_time >= 1.0)
-		{
-			std::cout << "FPS: " << frame_count << std::endl;
-			frame_count = 0;
-			previous_time += 1.0;
-		}
+		current_time = glfwGetTime();
+		delta = current_time - previous_time;
+		previous_time = current_time;
 		
-		//int width, height;
-		//glfwGetFramebufferSize(window, &width, &height);
-		//glViewport(0, 0, width, height);
-		
-		update();
+		update(delta);
 		draw();
 
 		glfwSwapBuffers(window);
@@ -83,12 +75,12 @@ void draw()
 			rendering::render(*entity);
 }
 
-void update()
+void update(double delta)
 {
 	for (Entity* entity : entities)
 	{
 		if (entity->type == Player)
-			player::update(entity, window, entities);
+			player::update(entity, window, entities, delta);
 	}
 }
 

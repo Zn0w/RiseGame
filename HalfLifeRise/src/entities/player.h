@@ -11,5 +11,5 @@
 namespace player
 {
 	// Input handling, collision detection of player
-	void update(Entity* player, GLFWwindow* window, std::vector<Entity*> entities);
+	void update(Entity* player, GLFWwindow* window, std::vector<Entity*> entities, double delta);
 }

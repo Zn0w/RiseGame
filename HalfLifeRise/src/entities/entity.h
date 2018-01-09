@@ -9,7 +9,7 @@ enum EntityType
 
 struct Entity
 {
-	int x, y;
+	double x, y;
 	int width, height;
 	// Draw/update if true, not if false
 	bool active;
