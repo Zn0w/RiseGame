@@ -65,6 +65,9 @@ void init()
 
 	Entity* wall = new Entity(150, 40, 80, 40, true, Object);
 	entities.push_back(wall);
+
+	Entity* ground = new Entity(50, 300, 200, 40, true, Ground);
+	entities.push_back(ground);
 }
 
 void draw()

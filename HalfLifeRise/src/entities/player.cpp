@@ -6,6 +6,9 @@ namespace player
 	
 	void player::update(Entity* player, GLFWwindow* window, std::vector<Entity*> entities, double delta)
 	{
+		// "Gravity"
+		player->y += 50 * delta;
+		
 		// Player entity input handling
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 			player->x += 100 * delta;
@@ -17,7 +20,11 @@ namespace player
 			player->y += 100 * delta;
 		
 		for (Entity* entity : entities)
+		{
 			if (entity->type == Object && collision::isColliding(player, entity))
 				std::cout << "Player is hitting static object\n";
+			else if (entity->type == Ground && collision::isCollidingBottom(player, entity))
+				player->y -= 1;
+		}
 	}
 }

@@ -4,7 +4,8 @@ enum EntityType
 {
 	Player,
 	Enemy,
-	Object
+	Object,
+	Ground
 };
 
 struct Entity
@@ -14,7 +15,6 @@ struct Entity
 	// Draw/update if true, not if false
 	bool active;
 	EntityType type;
-	const char* id;
 
 
 	Entity(int xpos, int ypos, int w, int h, bool a, EntityType t)
