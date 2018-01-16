@@ -12,6 +12,9 @@ void update(double delta);
 
 void glfwWindowResize(GLFWwindow* window, int width, int height);
 
+void createEntity(int x, int y, int width, int height, bool active, EntityType type);
+void deleteEntity(Entity* entity);
+
 std::vector<Entity*> entities;
 GLFWwindow* window;
 
@@ -60,14 +63,11 @@ void init()
 {
 	rendering::init(window);
 	
-	Entity* player = new Entity(50, 70, 80, 80, true, Player);
-	entities.push_back(player);
+	createEntity(50, 70, 80, 80, true, Player);
 
-	Entity* wall = new Entity(150, 40, 80, 40, true, Object);
-	entities.push_back(wall);
+	createEntity(150, 40, 80, 40, true, Object);
 
-	Entity* ground = new Entity(50, 300, 200, 40, true, Ground);
-	entities.push_back(ground);
+	createEntity(50, 300, 200, 40, true, Ground);
 }
 
 void draw()
@@ -90,4 +90,15 @@ void update(double delta)
 void glfwWindowResize(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void createEntity(int x, int y, int width, int height, bool active, EntityType type)
+{
+	Entity* entity = new Entity(x, y, width, height, active, type);
+	entities.push_back(entity);
+}
+
+void deleteEntity(Entity* entity)
+{
+	// to be implemented
 }

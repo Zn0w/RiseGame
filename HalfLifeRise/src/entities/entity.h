@@ -22,4 +22,9 @@ struct Entity
 	{
 
 	}
+
+	~Entity()
+	{
+		
+	}
 };
