@@ -2,7 +2,12 @@
 
 #include "../entity.h"
 
-void onClick()
+enum ButtonType
 {
+	Start,
+	Settings,
+	Guide,
+	Quit
+};
 
-}
+void onClick(ButtonType type);
