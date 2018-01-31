@@ -5,7 +5,8 @@ enum EntityType
 	Player,
 	Enemy,
 	Object,
-	Ground
+	Ground,
+	Lbl
 };
 
 struct Entity
