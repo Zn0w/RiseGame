@@ -6,7 +6,8 @@ enum EntityType
 	Enemy,
 	Object,
 	Ground,
-	Lbl
+	Gui_label,
+	Gui_button
 };
 
 struct Entity
