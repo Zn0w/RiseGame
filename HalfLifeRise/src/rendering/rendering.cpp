@@ -2,6 +2,9 @@
 
 namespace rendering
 {
+	// Local for rendering.cpp file function, renders a text on the screen
+	void drawString();
+	
 	void init(GLFWwindow* window)
 	{
 		int width, height;
@@ -20,12 +23,24 @@ namespace rendering
 
 	void render(Entity entity)
 	{
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex2i(entity.x, entity.y);
-		glVertex2i(entity.x + entity.width, entity.y);
-		glVertex2i(entity.x + entity.width, entity.y + entity.height);
-		glVertex2i(entity.x, entity.y + entity.height);
-		glEnd();
+		if (entity.type == Gui_label)
+		{
+			drawString();
+		}
+		else
+		{
+			glBegin(GL_QUADS);
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glVertex2i(entity.x, entity.y);
+			glVertex2i(entity.x + entity.width, entity.y);
+			glVertex2i(entity.x + entity.width, entity.y + entity.height);
+			glVertex2i(entity.x, entity.y + entity.height);
+			glEnd();
+		}
+	}
+
+	void drawString()
+	{
+
 	}
 }
