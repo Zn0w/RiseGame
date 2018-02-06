@@ -3,6 +3,7 @@
 #include "GLFW/glfw3.h"
 
 #include "../entities/entity.h"
+#include "../entities/gui/label.h"
 
 namespace rendering
 {

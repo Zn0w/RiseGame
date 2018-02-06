@@ -3,7 +3,7 @@
 namespace rendering
 {
 	// Local for rendering.cpp file function, renders a text on the screen
-	void drawString();
+	//void drawString(int xpos, int ypos, const char* text);
 	
 	void init(GLFWwindow* window)
 	{
@@ -25,7 +25,7 @@ namespace rendering
 	{
 		if (entity.type == Gui_label)
 		{
-			drawString();
+			//drawString(entity.x, entity.y, (Label) entity.text);
 		}
 		else
 		{
@@ -39,8 +39,8 @@ namespace rendering
 		}
 	}
 
-	void drawString()
+	/*void drawString(int xpos, int ypos, const char* text)
 	{
 
-	}
+	}*/
 }
