@@ -5,9 +5,6 @@ bool game_running = false;
 void update();
 void destroy();
 
-sf::RenderWindow window;
-sf::CircleShape shape;
-
 int main()
 {
 	// Init game before main loop
