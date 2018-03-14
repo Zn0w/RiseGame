@@ -1,6 +1,11 @@
+#include <vector>
+
 #include "graphics/render.h"
+#include "entity/entity.h"
 
 bool game_running = false;
+
+std::vector<Entity> entities;
 
 void update();
 void destroy();
