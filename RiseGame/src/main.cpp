@@ -5,19 +5,16 @@
 
 bool game_running = false;
 
-std::vector<Entity> entities;
-
-void update();
+void update(std::vector<Entity>*);
 void destroy();
 
 int main()
 {
-	// Init game before main loop
 	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-	sf::CircleShape shape(100.f);
-	//shape.setFillColor(sf::Color::Green);
+	std::vector<Entity> entities;
 
-	entities.push_back(Entity(shape));
+	// Init game before main loop
+	entities.push_back(Entity(sf::CircleShape(100.f)));
 
 	while (window.isOpen())
 	{
@@ -28,21 +25,15 @@ int main()
 				window.close();
 		}
 
-		// Will take vector<Entity> as a parameter
-		update();
+		update(&entities);
 
 		render_update(&window, &entities);
-
-		// Will be in render_update(window*, vector<Entity>)
-		//window.clear();
-		//window.draw(shape);
-		//window.display();
 	}
 
 	return 0;
 }
 
-void update()
+void update(std::vector<Entity>* entities)
 {
 	
 }
