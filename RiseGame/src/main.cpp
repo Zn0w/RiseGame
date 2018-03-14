@@ -10,11 +10,17 @@ void destroy();
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
 	std::vector<Entity> entities;
 
 	// Init game before main loop
-	entities.push_back(Entity(sf::CircleShape(100.f)));
+	sf::Texture ground_texture;
+	ground_texture.create(200, 500);
+	sf::Sprite ground_sprite;
+	ground_sprite.setTexture(ground_texture);
+	ground_sprite.setColor(sf::Color(0, 255, 0));
+	
+	entities.push_back(Entity(ground_sprite));
 
 	while (window.isOpen())
 	{
@@ -29,6 +35,8 @@ int main()
 
 		render_update(&window, &entities);
 	}
+
+	destroy();
 
 	return 0;
 }

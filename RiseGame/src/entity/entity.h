@@ -5,11 +5,11 @@
 struct Entity
 {
 	int x, y, width, height;
-	sf::CircleShape shape;
+	sf::Sprite sprite;
 
-	Entity(sf::CircleShape s)
-		: shape(s)
+	Entity(sf::Sprite s)
+		: sprite(s)
 	{
-		shape.setFillColor(sf::Color::Green);
+		
 	}
 };
