@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 
 #include "graphics/render.h"
 #include "entity/entity.h"
@@ -15,10 +16,14 @@ int main()
 
 	// Init game before main loop
 	sf::Texture ground_texture;
-	ground_texture.create(200, 500);
+	if (!ground_texture.loadFromFile("resources/grass.jpg"))
+	{
+		std::cout << "Couldn't load grass texture from file" << std::endl;
+	}
+	//ground_texture.create(200, 500);
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
-	ground_sprite.setColor(sf::Color(0, 255, 0));
+	//ground_sprite.setColor(sf::Color(0, 255, 0));
 	
 	entities.push_back(Entity(ground_sprite));
 
