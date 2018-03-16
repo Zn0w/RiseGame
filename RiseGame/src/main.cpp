@@ -15,6 +15,8 @@ int main()
 	std::vector<Entity> entities;
 
 	// Init game before main loop
+	
+	// Background init
 	sf::Texture ground_texture;
 	if (!ground_texture.loadFromFile("resources/grass_background.png"))
 	{
@@ -23,7 +25,20 @@ int main()
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
 	
-	entities.push_back(Entity(0, 0, 500, 200, ground_sprite));
+	entities.push_back(Entity(0, 0, 1280, 720, ground_sprite));
+
+	// Player init
+	sf::Texture player_texture;
+	if (!player_texture.loadFromFile("resources/mario_player.png"))
+	{
+		std::cout << "Couldn't load player texture from file." << std::endl;
+	}
+	sf::Sprite player_sprite;
+	player_sprite.setTexture(player_texture);
+
+	entities.push_back(Entity(400, 350, 186, 312, player_sprite));
+
+	// Main game loop
 
 	while (window.isOpen())
 	{
