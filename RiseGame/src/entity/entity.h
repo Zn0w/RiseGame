@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <SFML/Graphics.hpp>
 
 struct Entity
@@ -10,6 +12,11 @@ struct Entity
 	Entity(int xpos, int ypos, int w, int h, sf::Sprite s)
 		: x(xpos), y(ypos), width(w), height(h), sprite(s)
 	{
-		//sprite.setScale(1280 / 270, 720 / 270);
+		std::cout << sprite.getTexture()->getSize().x << " | " << sprite.getTexture()->getSize().y << std::endl;
+		
+		sprite.setScale(
+			(double) ((double) width / sprite.getTexture()->getSize().x), 
+			(double) ((double) height / sprite.getTexture()->getSize().y)
+		);
 	}
 };

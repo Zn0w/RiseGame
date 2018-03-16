@@ -16,14 +16,14 @@ int main()
 
 	// Init game before main loop
 	sf::Texture ground_texture;
-	if (!ground_texture.loadFromFile("D:/dev/RiseGame/RiseGame/src/resources/grass_background.png"))
+	if (!ground_texture.loadFromFile("resources/grass_background.png"))
 	{
 		std::cout << "Couldn't load grass texture from file." << std::endl;
 	}
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
 	
-	entities.push_back(Entity(0, 0, 500, 500, ground_sprite));
+	entities.push_back(Entity(0, 0, 500, 200, ground_sprite));
 
 	while (window.isOpen())
 	{
