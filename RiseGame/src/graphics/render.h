@@ -6,4 +6,4 @@
 
 #include "../entity/entity.h"
 
-void render_update(sf::RenderWindow*, std::vector<Entity>*);
+void render_update(sf::RenderWindow*, std::vector<Entity*>*);

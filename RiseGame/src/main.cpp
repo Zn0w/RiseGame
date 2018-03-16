@@ -6,13 +6,13 @@
 
 bool game_running = false;
 
-void update(std::vector<Entity>*);
+void update(std::vector<Entity*>*);
 void destroy();
 
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
-	std::vector<Entity> entities;
+	std::vector<Entity*> entities;
 
 	// Init game before main loop
 	
@@ -25,7 +25,7 @@ int main()
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
 	
-	entities.push_back(Entity(0, 0, 1280, 720, ground_sprite, Decor_Object));
+	entities.push_back(new Entity(0, 0, 1280, 720, ground_sprite, Decor_Object));
 
 	// Player init
 	sf::Texture player_texture;
@@ -36,7 +36,7 @@ int main()
 	sf::Sprite player_sprite;
 	player_sprite.setTexture(player_texture);
 
-	entities.push_back(Entity(400, 350, 186, 312, player_sprite, Player));
+	entities.push_back(new Entity(400, 350, 186, 312, player_sprite, Player));
 
 	// Main game loop
 
@@ -56,22 +56,46 @@ int main()
 
 	destroy();
 
-	std::cin.get();
-
 	return 0;
 }
 
-void update(std::vector<Entity>* entities)
+void update(std::vector<Entity*>* entities)
 {
-	for (Entity entity : *entities)
+	for (Entity* entity : *entities)
 	{
-		if (entity.type == Player)
+		if (entity->type == Player)
 		{
-			std::cout << "Player update" << std::endl;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			{
+				std::cout << "Left key is pressed!" << std::endl;
+				entity->x -= 1;
+				entity->sprite.setPosition(entity->x, entity->y);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				std::cout << "Right key is pressed!" << std::endl;
+				entity->x += 1;
+				entity->sprite.setPosition(entity->x, entity->y);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			{
+				std::cout << "Up key is pressed!" << std::endl;
+				entity->y -= 1;
+				entity->sprite.setPosition(entity->x, entity->y);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			{
+				std::cout << "Down key is pressed!" << std::endl;
+				entity->y += 1;
+				entity->sprite.setPosition(entity->x, entity->y);
+			}
 		}
-		else if (entity.type == Decor_Object)
+		else if (entity->type == Decor_Object)
 		{
-			std::cout << "Decor object update" << std::endl;
+			//std::cout << "Decor object update" << std::endl;
 		}
 	}
 }
