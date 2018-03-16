@@ -4,13 +4,20 @@
 
 #include <SFML/Graphics.hpp>
 
+enum EntityType
+{
+	Player,
+	Decor_Object
+};
+
 struct Entity
 {
 	int x, y, width, height;
 	sf::Sprite sprite;
+	EntityType type;
 
-	Entity(int xpos, int ypos, int w, int h, sf::Sprite s)
-		: x(xpos), y(ypos), width(w), height(h), sprite(s)
+	Entity(int xpos, int ypos, int w, int h, sf::Sprite s, EntityType t)
+		: x(xpos), y(ypos), width(w), height(h), sprite(s), type(t)
 	{	
 		sprite.setPosition(x, y);
 		

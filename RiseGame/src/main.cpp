@@ -25,7 +25,7 @@ int main()
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
 	
-	entities.push_back(Entity(0, 0, 1280, 720, ground_sprite));
+	entities.push_back(Entity(0, 0, 1280, 720, ground_sprite, Decor_Object));
 
 	// Player init
 	sf::Texture player_texture;
@@ -36,7 +36,7 @@ int main()
 	sf::Sprite player_sprite;
 	player_sprite.setTexture(player_texture);
 
-	entities.push_back(Entity(400, 350, 186, 312, player_sprite));
+	entities.push_back(Entity(400, 350, 186, 312, player_sprite, Player));
 
 	// Main game loop
 
@@ -56,12 +56,24 @@ int main()
 
 	destroy();
 
+	std::cin.get();
+
 	return 0;
 }
 
 void update(std::vector<Entity>* entities)
 {
-	
+	for (Entity entity : *entities)
+	{
+		if (entity.type == Player)
+		{
+			std::cout << "Player update" << std::endl;
+		}
+		else if (entity.type == Decor_Object)
+		{
+			std::cout << "Decor object update" << std::endl;
+		}
+	}
 }
 
 void destroy()
