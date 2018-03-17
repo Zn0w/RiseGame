@@ -26,6 +26,13 @@ int main()
 	// Init game before main loop
 
 	current_state = Menu;
+
+	// Game font init
+	sf::Font font;
+	if (!font.loadFromFile("resources/font/Spring is Coming - TTF.ttf"))
+	{
+		std::cout << "Couldn't load a game font." << std::endl;
+	}
 	
 	// Background init
 	sf::Texture ground_texture;
@@ -60,9 +67,15 @@ int main()
 				window.close();
 		}
 
-		update(&entities);
-
-		render_update(&window, &entities);
+		if (current_state == Running)
+		{
+			update(&entities);
+			render_update(&window, &entities);
+		}
+		else if (current_state == Menu)
+		{
+			render_text(&window, "This is a test!", font);
+		}
 	}
 
 	destroy();

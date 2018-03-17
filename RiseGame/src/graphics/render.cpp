@@ -10,3 +10,17 @@ void render_update(sf::RenderWindow* window, std::vector<Entity*>* entities)
 	}
 	window->display();
 }
+
+void render_text(sf::RenderWindow* window, const char* text, sf::Font font)
+{
+	window->clear();
+
+	sf::Text test_text;
+	test_text.setFont(font);
+	test_text.setCharacterSize(40);
+	test_text.setString(text);
+
+	window->draw(test_text);
+
+	window->display();
+}
