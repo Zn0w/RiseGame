@@ -16,7 +16,7 @@ bool game_running = false;
 GameState current_state;
 
 void update(std::vector<Entity*>*);
-void destroy();
+void destroy(sf::RenderWindow*);
 
 int main()
 {
@@ -25,6 +25,7 @@ int main()
 
 	// Init game before main loop
 
+	game_running = true;
 	current_state = Menu;
 
 	// Game font init
@@ -58,13 +59,13 @@ int main()
 
 	// Main game loop
 
-	while (window.isOpen())
+	while (window.isOpen() || game_running)
 	{
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
-				window.close();
+				destroy(&window);
 		}
 
 		if (current_state == Running)
@@ -76,9 +77,19 @@ int main()
 		{
 			render_text(&window, "This is a test!", font);
 		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			if (current_state == Running)
+				current_state = Pause;
+			else if (current_state == Pause)
+				current_state = Running;
+			else
+				game_running = false;
+		}
 	}
 
-	destroy();
+	destroy(&window);
 
 	return 0;
 }
@@ -98,7 +109,7 @@ void update(std::vector<Entity*>* entities)
 	}
 }
 
-void destroy()
+void destroy(sf::RenderWindow* window)
 {
-
+	window->close();
 }
