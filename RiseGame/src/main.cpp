@@ -5,7 +5,15 @@
 #include "entity/entity.h"
 #include "entity/update.h"
 
+enum GameState
+{
+	Menu,
+	Pause,
+	Running
+};
+
 bool game_running = false;
+GameState current_state;
 
 void update(std::vector<Entity*>*);
 void destroy();
@@ -16,6 +24,8 @@ int main()
 	std::vector<Entity*> entities;
 
 	// Init game before main loop
+
+	current_state = Menu;
 	
 	// Background init
 	sf::Texture ground_texture;
