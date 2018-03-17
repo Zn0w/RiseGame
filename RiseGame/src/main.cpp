@@ -3,6 +3,7 @@
 
 #include "graphics/render.h"
 #include "entity/entity.h"
+#include "entity/update.h"
 
 bool game_running = false;
 
@@ -18,7 +19,7 @@ int main()
 	
 	// Background init
 	sf::Texture ground_texture;
-	if (!ground_texture.loadFromFile("resources/grass_background.png"))
+	if (!ground_texture.loadFromFile("resources/textures/grass_background.png"))
 	{
 		std::cout << "Couldn't load grass texture from file." << std::endl;
 	}
@@ -29,7 +30,7 @@ int main()
 
 	// Player init
 	sf::Texture player_texture;
-	if (!player_texture.loadFromFile("resources/mario_player.png"))
+	if (!player_texture.loadFromFile("resources/textures/mario_player.png"))
 	{
 		std::cout << "Couldn't load player texture from file." << std::endl;
 	}
@@ -65,33 +66,7 @@ void update(std::vector<Entity*>* entities)
 	{
 		if (entity->type == Player)
 		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			{
-				std::cout << "Left key is pressed!" << std::endl;
-				entity->x -= 1;
-				entity->sprite.setPosition(entity->x, entity->y);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			{
-				std::cout << "Right key is pressed!" << std::endl;
-				entity->x += 1;
-				entity->sprite.setPosition(entity->x, entity->y);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-			{
-				std::cout << "Up key is pressed!" << std::endl;
-				entity->y -= 1;
-				entity->sprite.setPosition(entity->x, entity->y);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-			{
-				std::cout << "Down key is pressed!" << std::endl;
-				entity->y += 1;
-				entity->sprite.setPosition(entity->x, entity->y);
-			}
+			player_update(entity);
 		}
 		else if (entity->type == Decor_Object)
 		{
