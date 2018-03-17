@@ -59,7 +59,7 @@ int main()
 
 	// Main game loop
 
-	while (window.isOpen() || game_running)
+	while (window.isOpen() && game_running)
 	{
 		sf::Event event;
 		while (window.pollEvent(event))
