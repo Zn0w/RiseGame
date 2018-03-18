@@ -27,11 +27,15 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
 	std::vector<Entity*> entities;
+	std::vector<Button*> main_menu;
+	std::vector<Button*> pause_menu;
 
 	// Init game before main loop
 
 	game_running = true;
 	current_state = Running;
+
+	entities.reserve(2);
 
 	// Game font init
 	sf::Font font;
@@ -80,6 +84,7 @@ int main()
 		}
 		else if (current_state == Menu)
 		{
+			update(&main_menu);
 			render_text(&window, "This is a test!", font);
 		}
 
@@ -103,7 +108,7 @@ void update(std::vector<Entity*>* entities)
 {
 	for (Entity* entity : *entities)
 	{
-		if (entity->update != NULL)
+		if (entity->update != NULL && entity->active)
 			entity->update(entity);
 	}
 }

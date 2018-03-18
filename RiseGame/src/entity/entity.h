@@ -20,16 +20,6 @@ struct Entity
 			(double) ((double) height / sprite.getTexture()->getSize().y)
 		);
 
-		//active = true;
-
-		/*if (update_func == NULL)
-		{
-			std::cout << "Given update function = null" << std::endl;
-
-			void raw_update();
-			update = raw_update();
-		}*/
-
 		std::cout << "Sprite scale: " << sprite.getScale().x << " | " << sprite.getScale().y << std::endl;
 	}
 };
