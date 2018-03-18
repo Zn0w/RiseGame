@@ -52,6 +52,7 @@ int main()
 	play_txt.setFont(font);
 	play_txt.setCharacterSize(34);
 	play_txt.setString("Play!");
+	main_menu.push_back(new Button(500, 500, test_action, play_txt, true));
 	
 	// Background init
 	sf::Texture ground_texture;
