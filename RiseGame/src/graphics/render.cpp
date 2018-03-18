@@ -19,6 +19,7 @@ void render_text(sf::RenderWindow* window, const char* text, sf::Font font)
 	test_text.setFont(font);
 	test_text.setCharacterSize(40);
 	test_text.setString(text);
+	test_text.setPosition(640, 300);
 
 	window->draw(test_text);
 

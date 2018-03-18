@@ -15,6 +15,7 @@ struct Entity
 	int x, y, width, height;
 	sf::Sprite sprite;
 	EntityType type;
+	bool active;
 
 	Entity(int xpos, int ypos, int w, int h, sf::Sprite s, EntityType t)
 		: x(xpos), y(ypos), width(w), height(h), sprite(s), type(t)
@@ -25,6 +26,8 @@ struct Entity
 			(double) ((double) width / sprite.getTexture()->getSize().x), 
 			(double) ((double) height / sprite.getTexture()->getSize().y)
 		);
+
+		active = true;
 
 		std::cout << "Sprite scale: " << sprite.getScale().x << " | " << sprite.getScale().y << std::endl;
 	}
