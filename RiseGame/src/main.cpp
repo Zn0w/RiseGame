@@ -2,8 +2,12 @@
 #include <iostream>
 
 #include "graphics/render.h"
+
 #include "entity/entity.h"
 #include "entity/update.h"
+
+#include "button/button.h"
+#include "button/update.h"
 
 enum GameState
 {
@@ -16,6 +20,7 @@ bool game_running = false;
 GameState current_state;
 
 void update(std::vector<Entity*>*);
+void update(std::vector<Button*>*);
 void destroy(sf::RenderWindow*);
 
 int main()
@@ -106,6 +111,14 @@ void update(std::vector<Entity*>* entities)
 		{
 			//std::cout << "Decor object update" << std::endl;
 		}
+	}
+}
+
+void update(std::vector<Button*>* buttons)
+{
+	for (Button* button : *buttons)
+	{
+
 	}
 }
 
