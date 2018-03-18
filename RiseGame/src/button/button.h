@@ -6,7 +6,7 @@ struct Button
 {
 	int x, y;
 	sf::Text text;
-	void (*action) (void);
+	void(*action) (void) = NULL;
 	bool selected = false;
 
 	Button(int xpos, int ypos, void(*if_clicked) (void), sf::Text t)

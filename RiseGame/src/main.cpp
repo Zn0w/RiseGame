@@ -31,7 +31,7 @@ int main()
 	// Init game before main loop
 
 	game_running = true;
-	current_state = Menu;
+	current_state = Running;
 
 	// Game font init
 	sf::Font font;
@@ -49,7 +49,7 @@ int main()
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
 	
-	entities.push_back(new Entity(0, 0, 1280, 720, ground_sprite, Decor_Object));
+	entities.push_back(new Entity(0, 0, 1280, 720, ground_sprite, NULL));
 
 	// Player init
 	sf::Texture player_texture;
@@ -60,7 +60,7 @@ int main()
 	sf::Sprite player_sprite;
 	player_sprite.setTexture(player_texture);
 
-	entities.push_back(new Entity(400, 350, 186, 312, player_sprite, Player));
+	entities.push_back(new Entity(400, 350, 186, 312, player_sprite, player_update));
 
 	// Main game loop
 
@@ -103,14 +103,8 @@ void update(std::vector<Entity*>* entities)
 {
 	for (Entity* entity : *entities)
 	{
-		if (entity->type == Player)
-		{
-			player_update(entity);
-		}
-		else if (entity->type == Decor_Object)
-		{
-			//std::cout << "Decor object update" << std::endl;
-		}
+		if (entity->update != NULL)
+			entity->update(entity);
 	}
 }
 
