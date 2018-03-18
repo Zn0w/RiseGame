@@ -19,13 +19,16 @@ enum GameState
 bool game_running = false;
 GameState current_state;
 
-void update(std::vector<Entity*>*);
+void update(std::vector<Entity*>*, float);
 void update(std::vector<Button*>*);
 void destroy(sf::RenderWindow*);
 
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
+	window.setFramerateLimit(60);
+	sf::Clock clock;
+
 	std::vector<Entity*> entities;
 	std::vector<Button*> main_menu;
 	std::vector<Button*> pause_menu;
@@ -70,6 +73,9 @@ int main()
 
 	while (window.isOpen() && game_running)
 	{
+		float time = clock.getElapsedTime().asMilliseconds();
+		clock.restart();
+		
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -79,7 +85,7 @@ int main()
 
 		if (current_state == Running)
 		{
-			update(&entities);
+			update(&entities, time);
 			render_update(&window, &entities);
 		}
 		else if (current_state == Menu)
@@ -104,12 +110,12 @@ int main()
 	return 0;
 }
 
-void update(std::vector<Entity*>* entities)
+void update(std::vector<Entity*>* entities, float t)
 {
 	for (Entity* entity : *entities)
 	{
 		if (entity->update != NULL && entity->active)
-			entity->update(entity);
+			entity->update(entity, t);
 	}
 }
 

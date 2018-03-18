@@ -6,12 +6,12 @@
 
 struct Entity
 {
-	int x, y, width, height;
+	float x, y, width, height;
 	sf::Sprite sprite;
 	bool active;
-	void(*update) (Entity* self) = NULL;
+	void(*update) (Entity* self, float t) = NULL;
 
-	Entity(int xpos, int ypos, int w, int h, sf::Sprite s, void(*update_func)(Entity* self))
+	Entity(float xpos, float ypos, float w, float h, sf::Sprite s, void(*update_func)(Entity* self, float t))
 		: x(xpos), y(ypos), width(w), height(h), sprite(s), active(true), update(update_func)
 	{	
 		sprite.setPosition(x, y);

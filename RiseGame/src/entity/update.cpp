@@ -1,33 +1,30 @@
 #include "update.h"
 
-void player_update(Entity* entity)
+void player_update(Entity* entity, float t)
 {
 	// Keyboard input handling
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		std::cout << "Left key is pressed!" << std::endl;
-		entity->x -= 1;
+		entity->x -= 1.0f * t;
 		entity->sprite.setPosition(entity->x, entity->y);
+		//entity->sprite.move(-0.001 * t, 0);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		std::cout << "Right key is pressed!" << std::endl;
-		entity->x += 1;
+		entity->x += 1.0f * t;
 		entity->sprite.setPosition(entity->x, entity->y);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		std::cout << "Up key is pressed!" << std::endl;
-		entity->y -= 1;
+		entity->y -= 1.0f * t;
 		entity->sprite.setPosition(entity->x, entity->y);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		std::cout << "Down key is pressed!" << std::endl;
-		entity->y += 1;
+		entity->y += 1.0f * t;
 		entity->sprite.setPosition(entity->x, entity->y);
 	}
 }
