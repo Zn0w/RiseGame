@@ -7,7 +7,7 @@
 #include "entity/update.h"
 
 #include "button/button.h"
-#include "button/update.h"
+#include "button/events.h"
 
 enum GameState
 {
@@ -46,6 +46,12 @@ int main()
 	{
 		std::cout << "Couldn't load a game font." << std::endl;
 	}
+
+	// Main menu elements init
+	sf::Text play_txt;
+	play_txt.setFont(font);
+	play_txt.setCharacterSize(34);
+	play_txt.setString("Play!");
 	
 	// Background init
 	sf::Texture ground_texture;

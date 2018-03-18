@@ -3,7 +3,7 @@
 void render_update(sf::RenderWindow* window, std::vector<Entity*>* entities)
 {
 	window->clear();
-	// Then loop over a vector array and window->draw(entity.texture);
+	// Todo: don't render if entity is not within camera region
 	for (Entity* entity : *entities)
 	{
 		if (entity->active)
