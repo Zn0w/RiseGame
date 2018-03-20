@@ -36,7 +36,7 @@ int main()
 	// Init game before main loop
 
 	game_running = true;
-	current_state = Running;
+	current_state = Menu;
 
 	entities.reserve(2);
 
@@ -128,6 +128,23 @@ void update(std::vector<Entity*>* entities, float t)
 
 void update(std::vector<Button*>* buttons)
 {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+	{
+		// Wait for player to release a Return key
+		while (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+		{
+
+		}
+		
+		for (Button* button : *buttons)
+		{
+			if (button->selected)
+			{
+				button->action();
+				break;
+			}
+		}
+	}
 	for (Button* button : *buttons)
 	{
 
