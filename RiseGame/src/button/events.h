@@ -4,4 +4,8 @@
 
 #include <iostream>
 
-void test_action();
+void test_play_action();
+
+void test_guide_action();
+
+void test_quit_action();
