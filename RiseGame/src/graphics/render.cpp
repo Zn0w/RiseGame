@@ -12,17 +12,14 @@ void render_update(sf::RenderWindow* window, std::vector<Entity*>* entities)
 	window->display();
 }
 
-void render_text(sf::RenderWindow* window, const char* text, sf::Font font)
+void render_menu(sf::RenderWindow* window, std::vector<Button*>* buttons)
 {
 	window->clear();
 
-	sf::Text test_text;
-	test_text.setFont(font);
-	test_text.setCharacterSize(40);
-	test_text.setString(text);
-	test_text.setPosition(640, 300);
-
-	window->draw(test_text);
+	for (Button* button : *buttons)
+	{
+		window->draw(button->text);
+	}
 
 	window->display();
 }

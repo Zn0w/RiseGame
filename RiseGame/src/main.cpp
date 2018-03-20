@@ -52,19 +52,19 @@ int main()
 	play_txt.setFont(font);
 	play_txt.setCharacterSize(34);
 	play_txt.setString("Play!");
-	main_menu.push_back(new Button(500, 500, test_play_action, play_txt, true));
+	main_menu.push_back(new Button(500, 250, test_play_action, play_txt, true));
 
 	sf::Text guide_txt;
 	guide_txt.setFont(font);
 	guide_txt.setCharacterSize(34);
 	guide_txt.setString("See guide");
-	main_menu.push_back(new Button(500, 500, test_guide_action, guide_txt, false));
+	main_menu.push_back(new Button(500, 350, test_guide_action, guide_txt, false));
 
 	sf::Text quit_txt;
 	quit_txt.setFont(font);
 	quit_txt.setCharacterSize(34);
 	quit_txt.setString("Quit");
-	main_menu.push_back(new Button(500, 500, test_quit_action, quit_txt, false));
+	main_menu.push_back(new Button(500, 450, test_quit_action, quit_txt, false));
 	
 	// Background init
 	sf::Texture ground_texture;
@@ -110,7 +110,7 @@ int main()
 		else if (current_state == Menu)
 		{
 			update(&main_menu);
-			render_text(&window, "This is a test!", font);
+			render_menu(&window, &main_menu);
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -170,7 +170,9 @@ void update(std::vector<Button*>* buttons)
 			if (buttons->at(i)->selected && i > 0)
 			{
 				buttons->at(i)->selected = false;
+				buttons->at(i)->text.setFillColor(sf::Color::White);
 				buttons->at(i - 1)->selected = true;
+				buttons->at(i - 1)->text.setFillColor(sf::Color::Green);
 				break;
 			}
 		}
@@ -188,7 +190,9 @@ void update(std::vector<Button*>* buttons)
 			if (buttons->at(i)->selected && i < buttons->size() - 1)
 			{
 				buttons->at(i)->selected = false;
+				buttons->at(i)->text.setFillColor(sf::Color::White);
 				buttons->at(i + 1)->selected = true;
+				buttons->at(i + 1)->text.setFillColor(sf::Color::Green);
 				break;
 			}
 		}
