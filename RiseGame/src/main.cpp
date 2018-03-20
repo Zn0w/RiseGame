@@ -145,9 +145,41 @@ void update(std::vector<Button*>* buttons)
 			}
 		}
 	}
-	for (Button* button : *buttons)
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
+		// Wait for player to release an Up key
+		while (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
 
+		}
+
+		for (int i = 0; i < buttons->size(); i++)
+		{
+			if (buttons->at(i)->selected && i > 0)
+			{
+				buttons->at(i)->selected = false;
+				buttons->at(i - 1)->selected = true;
+				break;
+			}
+		}
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		// Wait for player to release a Down key
+		while (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+
+		}
+
+		for (int i = 0; i < buttons->size(); i++)
+		{
+			if (buttons->at(i)->selected && i < buttons->size() - 1)
+			{
+				buttons->at(i)->selected = false;
+				buttons->at(i + 1)->selected = true;
+				break;
+			}
+		}
 	}
 }
 
