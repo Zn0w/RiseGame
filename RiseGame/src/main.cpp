@@ -23,6 +23,11 @@ void update(std::vector<Entity*>*, float);
 void update(std::vector<Button*>*);
 void destroy(sf::RenderWindow*);
 
+//Button events
+void play_action();
+void guide_action();
+void quit_action();
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
@@ -48,18 +53,22 @@ int main()
 	}
 
 	// Main menu elements init
+
+	// Play button
 	sf::Text play_txt;
 	play_txt.setFont(font);
 	play_txt.setCharacterSize(34);
 	play_txt.setString("Play!");
-	main_menu.push_back(new Button(500, 250, test_play_action, play_txt, true));
+	main_menu.push_back(new Button(500, 250, play_action, play_txt, true));
 
+	// Guide button
 	sf::Text guide_txt;
 	guide_txt.setFont(font);
 	guide_txt.setCharacterSize(34);
 	guide_txt.setString("See guide");
 	main_menu.push_back(new Button(500, 350, test_guide_action, guide_txt, false));
 
+	// Quit button
 	sf::Text quit_txt;
 	quit_txt.setFont(font);
 	quit_txt.setCharacterSize(34);
@@ -202,4 +211,11 @@ void update(std::vector<Button*>* buttons)
 void destroy(sf::RenderWindow* window)
 {
 	window->close();
+}
+
+// Button events
+
+void play_action()
+{
+	current_state = Running;
 }
