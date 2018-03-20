@@ -1,16 +1,16 @@
 #include "events.h"
 
-void test_play_action()
+void play_action(GameState* state)
 {
-	std::cout << "Play button is pressed!" << std::endl;
+	*state = Running;
 }
 
-void test_guide_action()
+void guide_action(GameState* state)
 {
 	std::cout << "Guide button is pressed!" << std::endl;
 }
 
-void test_quit_action()
+void quit_action(GameState* state)
 {
 	std::cout << "Quit button is pressed!" << std::endl;
 }

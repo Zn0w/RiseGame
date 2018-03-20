@@ -3,19 +3,13 @@
 
 #include "graphics/render.h"
 
+#include "game_state.h"
+
 #include "entity/entity.h"
 #include "entity/update.h"
 
 #include "button/button.h"
 #include "button/events.h"
-
-enum GameState
-{
-	Menu,
-	Guide,
-	Pause,
-	Running
-};
 
 bool game_running = false;
 GameState current_state;
@@ -158,7 +152,7 @@ void update(std::vector<Button*>* buttons)
 		{
 			if (button->selected)
 			{
-				button->action();
+				button->action(&current_state);
 				break;
 			}
 		}

@@ -4,8 +4,10 @@
 
 #include <iostream>
 
-void test_play_action();
+#include "../game_state.h"
 
-void test_guide_action();
+void play_action(GameState*);
 
-void test_quit_action();
+void guide_action(GameState*);
+
+void quit_action(GameState*);
