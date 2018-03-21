@@ -102,6 +102,8 @@ int main()
 				destroy(&window);
 		}
 
+		// Find out what current game state is
+		
 		if (current_state == Running)
 		{
 			update(&entities, time);
@@ -111,6 +113,18 @@ int main()
 		{
 			update(&main_menu);
 			render_menu(&window, &main_menu);
+		}
+		else if (current_state == Pause)
+		{
+			// draw and call update of pause menu
+		}
+		else if (current_state == Saving)
+		{
+			// Save current game state
+		}
+		else if (current_state == Guide)
+		{
+			// Show guide window
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))

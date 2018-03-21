@@ -7,7 +7,7 @@ void play_action(GameState* state)
 
 void guide_action(GameState* state)
 {
-	std::cout << "Guide button is pressed!" << std::endl;
+	*state = Guide;
 }
 
 void quit_action(GameState* state)
