@@ -14,8 +14,10 @@
 bool game_running = false;
 GameState current_state;
 
-void update(std::vector<Entity*>*, float);
-void update(std::vector<Button*>*);
+void running_update(std::vector<Entity*>*, float); // Update function for Running state
+void menu_update(std::vector<Button*>*); // Update function for Main and Pause state
+void guide_update(sf::Font); // Update fucntion for Guide state
+
 void destroy(sf::RenderWindow*);
 
 
@@ -32,7 +34,7 @@ int main()
 	// Init game before main loop
 
 	game_running = true;
-	current_state = Menu;
+	current_state = Main;
 
 	entities.reserve(2);
 
@@ -109,7 +111,7 @@ int main()
 			update(&entities, time);
 			render_update(&window, &entities);
 		}
-		else if (current_state == Menu)
+		else if (current_state == Main)
 		{
 			update(&main_menu);
 			render_menu(&window, &main_menu);
@@ -126,15 +128,10 @@ int main()
 		{
 			// Show guide window
 		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		else if (current_state == Quit)
 		{
-			if (current_state == Running)
-				current_state = Pause;
-			else if (current_state == Pause)
-				current_state = Running;
-			else
-				game_running = false;
+			game_running = false;
+			// Todo: ask user wether they want to save the game or not
 		}
 	}
 
@@ -216,5 +213,4 @@ void update(std::vector<Button*>* buttons)
 void destroy(sf::RenderWindow* window)
 {
 	window->close();
-	// Todo: Save the game state
 }

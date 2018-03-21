@@ -2,9 +2,10 @@
 
 enum GameState
 {
-	Menu,
+	Main,
 	Running,
 	Pause,
 	Guide,
-	Saving
+	Saving,
+	Quit
 };
