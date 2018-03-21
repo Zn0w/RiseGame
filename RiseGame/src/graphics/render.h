@@ -10,3 +10,5 @@
 void render_update(sf::RenderWindow*, std::vector<Entity*>*); // Todo: don't render if entity is not within camera region
 
 void render_menu(sf::RenderWindow*, std::vector<Button*>*);
+
+void render_text(sf::RenderWindow*, sf::Text);

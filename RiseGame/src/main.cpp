@@ -16,7 +16,7 @@ GameState current_state;
 
 void running_update(std::vector<Entity*>*, float); // Update function for Running state
 void menu_update(std::vector<Button*>*); // Update function for Main and Pause state
-void guide_update(sf::Font); // Update fucntion for Guide state
+void guide_update(); // Update fucntion for Guide state
 
 void destroy(sf::RenderWindow*);
 
@@ -108,12 +108,12 @@ int main()
 		
 		if (current_state == Running)
 		{
-			update(&entities, time);
+			running_update(&entities, time);
 			render_update(&window, &entities);
 		}
 		else if (current_state == Main)
 		{
-			update(&main_menu);
+			menu_update(&main_menu);
 			render_menu(&window, &main_menu);
 		}
 		else if (current_state == Pause)
@@ -126,7 +126,24 @@ int main()
 		}
 		else if (current_state == Guide)
 		{
-			// Show guide window
+			sf::Text guide_txt;
+			guide_txt.setFont(font);
+			guide_txt.setCharacterSize(34);
+			guide_txt.setString("This is guide. Press return to go back to the main menu.");
+
+			while (true)
+			{
+				render_text(&window, guide_txt);
+				
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+				{
+					while (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+					{
+
+					}
+				}
+			}
+			current_state = Main;
 		}
 		else if (current_state == Quit)
 		{
@@ -140,7 +157,7 @@ int main()
 	return 0;
 }
 
-void update(std::vector<Entity*>* entities, float t)
+void running_update(std::vector<Entity*>* entities, float t)
 {
 	for (Entity* entity : *entities)
 	{
@@ -149,7 +166,7 @@ void update(std::vector<Entity*>* entities, float t)
 	}
 }
 
-void update(std::vector<Button*>* buttons)
+void menu_update(std::vector<Button*>* buttons)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
 	{

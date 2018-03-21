@@ -23,3 +23,10 @@ void render_menu(sf::RenderWindow* window, std::vector<Button*>* buttons)
 
 	window->display();
 }
+
+void render_text(sf::RenderWindow* window, sf::Text text)
+{
+	window->clear();
+	window->draw(text);
+	window->display();
+}

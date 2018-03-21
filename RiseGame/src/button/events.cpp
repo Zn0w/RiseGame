@@ -12,5 +12,5 @@ void guide_action(GameState* state)
 
 void quit_action(GameState* state)
 {
-	std::cout << "Quit button is pressed!" << std::endl;
+	*state = Quit;
 }

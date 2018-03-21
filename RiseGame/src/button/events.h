@@ -2,8 +2,6 @@
 
 #include "button.h"
 
-#include <iostream>
-
 #include "../game_state.h"
 
 void play_action(GameState*);
