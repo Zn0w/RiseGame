@@ -38,12 +38,14 @@ int main()
 
 	entities.reserve(2);
 
+
 	// Game font init
 	sf::Font font;
 	if (!font.loadFromFile("resources/font/Spring is Coming - TTF.ttf"))
 	{
 		std::cout << "Couldn't load a game font." << std::endl;
 	}
+
 
 	// Main menu elements init
 
@@ -67,6 +69,16 @@ int main()
 	quit_txt.setCharacterSize(34);
 	quit_txt.setString("Quit");
 	main_menu.push_back(new Button(500, 450, quit_action, quit_txt, false));
+
+
+	// Guide window assets init
+	sf::Text guide_test;
+	guide_test.setFont(font);
+	guide_test.setCharacterSize(34);
+	guide_test.setString("This is guide. Press return to go back to the main menu.");
+
+
+	// Game entities init
 	
 	// Background init
 	sf::Texture ground_texture;
@@ -89,6 +101,7 @@ int main()
 	player_sprite.setTexture(player_texture);
 
 	entities.push_back(new Entity(400, 350, 186, 312, player_sprite, player_update));
+
 
 	// Main game loop
 
@@ -126,24 +139,8 @@ int main()
 		}
 		else if (current_state == Guide)
 		{
-			sf::Text guide_txt;
-			guide_txt.setFont(font);
-			guide_txt.setCharacterSize(34);
-			guide_txt.setString("This is guide. Press return to go back to the main menu.");
-
-			while (true)
-			{
-				render_text(&window, guide_txt);
-				
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-				{
-					while (!sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-					{
-
-					}
-				}
-			}
-			current_state = Main;
+			guide_update();
+			render_text(&window, guide_test);
 		}
 		else if (current_state == Quit)
 		{
@@ -226,6 +223,21 @@ void menu_update(std::vector<Button*>* buttons)
 		}
 	}
 }
+
+void guide_update()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+	{
+		// Wait for player to release a Return key
+		while (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+		{
+
+		}
+
+		current_state = Main;
+	}
+}
+
 
 void destroy(sf::RenderWindow* window)
 {
