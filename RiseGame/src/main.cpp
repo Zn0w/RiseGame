@@ -71,6 +71,16 @@ int main()
 	main_menu.push_back(new Button(500, 450, quit_action, quit_txt, false));
 
 
+	// Pause menu elements init
+
+	// Go back to the game button
+	sf::Text back_txt;
+	back_txt.setFont(font);
+	back_txt.setCharacterSize(34);
+	back_txt.setString("Go back to the game");
+	pause_menu.push_back(new Button(500, 250, play_action, back_txt, true));
+
+
 	// Guide window assets init
 	sf::Text guide_test;
 	guide_test.setFont(font);
@@ -131,7 +141,8 @@ int main()
 		}
 		else if (current_state == Pause)
 		{
-			// draw and call update of pause menu
+			menu_update(&pause_menu);
+			render_menu(&window, &pause_menu);
 		}
 		else if (current_state == Saving)
 		{
@@ -156,6 +167,11 @@ int main()
 
 void running_update(std::vector<Entity*>* entities, float t)
 {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	{
+		current_state = Pause;
+	}
+	
 	for (Entity* entity : *entities)
 	{
 		if (entity->update != NULL && entity->active)
