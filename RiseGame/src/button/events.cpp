@@ -14,3 +14,13 @@ void quit_action(GameState* state)
 {
 	*state = Quit;
 }
+
+void save_action(GameState* state)
+{
+	*state = Saving;
+}
+
+void main_menu_action(GameState* state)
+{
+	*state = Main;
+}
