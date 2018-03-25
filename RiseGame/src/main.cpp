@@ -24,7 +24,7 @@ void destroy(sf::RenderWindow*);
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
-	window.setFramerateLimit(60);
+	window.setVerticalSyncEnabled(true);
 	sf::Clock clock;
 
 	std::vector<Entity*> entities;
@@ -103,7 +103,7 @@ int main()
 
 
 	// Game entities init
-	
+
 	// Background init
 	sf::Texture ground_texture;
 	if (!ground_texture.loadFromFile("resources/textures/grass_background.png"))
@@ -112,7 +112,7 @@ int main()
 	}
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
-	
+
 	entities.push_back(new Entity(0, 0, 1280, 720, ground_sprite, NULL));
 
 	// Player init
@@ -133,7 +133,7 @@ int main()
 	{
 		float time = clock.getElapsedTime().asMilliseconds();
 		clock.restart();
-		
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -142,7 +142,7 @@ int main()
 		}
 
 		// Find out what current game state is
-		
+
 		if (current_state == Running)
 		{
 			running_update(&entities, time);
@@ -185,7 +185,7 @@ void running_update(std::vector<Entity*>* entities, float t)
 	{
 		current_state = Pause;
 	}
-	
+
 	for (Entity* entity : *entities)
 	{
 		if (entity->update != NULL && entity->active)
@@ -202,7 +202,7 @@ void menu_update(std::vector<Button*>* buttons)
 		{
 
 		}
-		
+
 		for (Button* button : *buttons)
 		{
 			if (button->selected)
