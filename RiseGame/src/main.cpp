@@ -23,7 +23,7 @@ void destroy(sf::RenderWindow*);
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Rise Game", sf::Style::Fullscreen);
 	window.setVerticalSyncEnabled(true);
 	sf::Clock clock;
 
@@ -46,6 +46,8 @@ int main()
 		std::cout << "Couldn't load a game font." << std::endl;
 	}
 
+	sf::Vector2u window_size = window.getSize();
+
 
 	// Main menu elements init
 
@@ -54,21 +56,45 @@ int main()
 	play_txt.setFont(font);
 	play_txt.setCharacterSize(34);
 	play_txt.setString("Play!");
-	main_menu.push_back(new Button(500, 250, play_action, play_txt, true));
+	main_menu.push_back(new Button(
+		
+		window_size.x / 16, 
+		window_size.y / 9 * 6, 
+		play_action, 
+		play_txt, 
+		true
+
+	));
 
 	// Guide button
 	sf::Text guide_txt;
 	guide_txt.setFont(font);
 	guide_txt.setCharacterSize(34);
 	guide_txt.setString("See guide");
-	main_menu.push_back(new Button(500, 350, guide_action, guide_txt, false));
+	main_menu.push_back(new Button(
+		
+		window_size.x / 16, 
+		(window_size.y / 9 * 6) + (window_size.y / 18), 
+		guide_action, 
+		guide_txt, 
+		false
+
+	));
 
 	// Quit button
 	sf::Text quit_txt;
 	quit_txt.setFont(font);
 	quit_txt.setCharacterSize(34);
 	quit_txt.setString("Quit");
-	main_menu.push_back(new Button(500, 450, quit_action, quit_txt, false));
+	main_menu.push_back(new Button(
+		
+		window_size.x / 16, 
+		(window_size.y / 9 * 6) + (window_size.y / 18 * 2), 
+		quit_action, 
+		quit_txt, 
+		false
+
+	));
 
 
 	// Pause menu elements init
@@ -139,6 +165,8 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				destroy(&window);
+			else if (event.type == sf::Event::Resized)
+				std::cout << window.getSize().x << " | " << window.getSize().y << std::endl;
 		}
 
 		// Find out what current game state is
