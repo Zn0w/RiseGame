@@ -104,21 +104,45 @@ int main()
 	back_txt.setFont(font);
 	back_txt.setCharacterSize(34);
 	back_txt.setString("Go back to the game");
-	pause_menu.push_back(new Button(500, 250, play_action, back_txt, true));
+	pause_menu.push_back(new Button(
+
+		window_size.x / 16,
+		window_size.y / 9 * 6,
+		play_action, 
+		back_txt, 
+		true
+
+	));
 
 	// Save button
 	sf::Text save_txt;
 	save_txt.setFont(font);
 	save_txt.setCharacterSize(34);
 	save_txt.setString("Save the game");
-	pause_menu.push_back(new Button(500, 350, save_action, save_txt, false));
+	pause_menu.push_back(new Button(
+		
+		window_size.x / 16,
+		(window_size.y / 9 * 6) + (window_size.y / 18),
+		save_action, 
+		save_txt, 
+		false
+	
+	));
 
 	// Go to the main menu button
 	sf::Text go_main_txt;
 	go_main_txt.setFont(font);
 	go_main_txt.setCharacterSize(34);
 	go_main_txt.setString("Go to the main menu");
-	pause_menu.push_back(new Button(500, 450, main_menu_action, go_main_txt, false));
+	pause_menu.push_back(new Button(
+		
+		window_size.x / 16,
+		(window_size.y / 9 * 6) + (window_size.y / 18 * 2),
+		main_menu_action, 
+		go_main_txt, 
+		false
+	
+	));
 
 
 	// Guide window assets init
