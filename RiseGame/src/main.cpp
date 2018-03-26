@@ -163,7 +163,7 @@ int main()
 	sf::Sprite ground_sprite;
 	ground_sprite.setTexture(ground_texture);
 
-	entities.push_back(new Entity(0, 0, 1280, 720, ground_sprite, NULL));
+	entities.push_back(new Entity(0, 0, 1280, 720, Decor_object, ground_sprite, NULL));
 
 	// Player init
 	sf::Texture player_texture;
@@ -174,7 +174,7 @@ int main()
 	sf::Sprite player_sprite;
 	player_sprite.setTexture(player_texture);
 
-	entities.push_back(new Entity(400, 350, 186, 312, player_sprite, player_update));
+	entities.push_back(new Entity(400, 350, 186, 312, Player, player_sprite, player_update));
 
 
 	// Main game loop
