@@ -241,7 +241,7 @@ void running_update(std::vector<Entity*>* entities, float t)
 	for (Entity* entity : *entities)
 	{
 		if (entity->update != NULL && entity->active)
-			entity->update(entity, t);
+			entity->update(entity, entities, t);
 	}
 }
 

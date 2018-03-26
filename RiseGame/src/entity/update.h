@@ -2,4 +2,4 @@
 
 #include "entity.h"
 
-void player_update(Entity*, float);
+void player_update(Entity*, std::vector<Entity*>*, float);

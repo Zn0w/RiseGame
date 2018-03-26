@@ -1,6 +1,6 @@
 #include "update.h"
 
-void player_update(Entity* entity, float t)
+void player_update(Entity* entity, std::vector<Entity*>* entities, float t)
 {
 	// Keyboard input handling
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
