@@ -1,6 +1,8 @@
 #include <vector>
 #include <iostream>
 
+#include <SFML/Audio.hpp>
+
 #include "graphics/render.h"
 
 #include "game_state.h"
@@ -175,6 +177,16 @@ int main()
 	player_sprite.setTexture(player_texture);
 
 	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, player_sprite, player_update));
+
+
+	// Sound effects init
+
+	// Test sound
+	sf::SoundBuffer sound_buffer;
+	if (!sound_buffer.loadFromFile("laser.wav"))
+		std::cout << "Couldn't load laser sound effect." << std::endl;
+	sf::Sound laser_sound;
+	laser_sound.setBuffer(sound_buffer);
 
 
 	// Main game loop
