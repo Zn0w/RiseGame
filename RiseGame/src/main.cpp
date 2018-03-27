@@ -16,7 +16,7 @@
 bool game_running = false;
 GameState current_state;
 
-void running_update(std::vector<Entity*>*, float); // Update function for Running state
+//void running_update(std::vector<Entity*>*, float); // Update function for Running state
 void menu_update(std::vector<Button*>*); // Update function for Main and Pause state
 void guide_update(); // Update fucntion for Guide state
 
@@ -179,14 +179,16 @@ int main()
 	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, player_sprite, player_update));
 
 
+	// Doesn't work
+	
 	// Sound effects init
 
 	// Test sound
-	sf::SoundBuffer sound_buffer;
-	if (!sound_buffer.loadFromFile("laser.wav"))
-		std::cout << "Couldn't load laser sound effect." << std::endl;
-	sf::Sound laser_sound;
-	laser_sound.setBuffer(sound_buffer);
+	//sf::Sound buffer;
+	//if (!sound_buffer.loadFromFile("laser.wav"))
+		//std::cout << "Couldn't load laser sound effect." << std::endl;
+	//sf::Sound laser_sound;
+	//laser_sound.setBuffer(sound_buffer);
 
 
 	// Main game loop
@@ -209,7 +211,51 @@ int main()
 
 		if (current_state == Running)
 		{
-			running_update(&entities, time);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			{
+				current_state = Pause;
+			}
+
+			for (Entity* entity : entities)
+			{
+				if (entity->active && entity->type == Player)
+				{
+					// Keyboard input handling
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+					{
+						entity->dimensions.x -= 1.0f * time;
+						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+					}
+
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+					{
+						entity->dimensions.x += 1.0f * time;
+						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+					}
+
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+					{
+						entity->dimensions.y -= 1.0f * time;
+						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+					}
+
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+					{
+						entity->dimensions.y += 1.0f * time;
+						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+					}
+
+					for (Entity* other_entity : entities)
+					{
+						if (other_entity->type == Decor_object && areColliding(entity->dimensions, other_entity->dimensions))
+						{
+							// Doesn't work
+							//laser_sound.play();
+							//laser_sound.stop();
+						}
+					}
+				}
+			}
 			render_update(&window, &entities);
 		}
 		else if (current_state == Main)
@@ -243,7 +289,7 @@ int main()
 	return 0;
 }
 
-void running_update(std::vector<Entity*>* entities, float t)
+/*void running_update(std::vector<Entity*>* entities, float t)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
@@ -252,10 +298,43 @@ void running_update(std::vector<Entity*>* entities, float t)
 
 	for (Entity* entity : *entities)
 	{
-		if (entity->update != NULL && entity->active)
-			entity->update(entity, entities, t);
+		if (entity->active && entity->type == Player)
+		{
+			// Keyboard input handling
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			{
+				entity->dimensions.x -= 1.0f * t;
+				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				entity->dimensions.x += 1.0f * t;
+				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			{
+				entity->dimensions.y -= 1.0f * t;
+				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			{
+				entity->dimensions.y += 1.0f * t;
+				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
+			}
+
+			for (Entity* other_entity : *entities)
+			{
+				if (other_entity->type == Decor_object && areColliding(entity->dimensions, other_entity->dimensions))
+				{
+					laser
+				}
+			}
+		}
 	}
-}
+}*/
 
 void menu_update(std::vector<Button*>* buttons)
 {
