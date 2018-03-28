@@ -75,12 +75,24 @@ int main()
 
 	));
 
+	// Settings button
+	text_buffer.setString("Settings");
+	main_menu.push_back(new Button(
+
+		window_size.x / 16,
+		(window_size.y / 9 * 6) + (window_size.y / 18 * 2),
+		settings_action,
+		text_buffer,
+		false
+
+	));
+
 	// Quit button
 	text_buffer.setString("Quit");
 	main_menu.push_back(new Button(
 		
 		window_size.x / 16, 
-		(window_size.y / 9 * 6) + (window_size.y / 18 * 2), 
+		(window_size.y / 9 * 6) + (window_size.y / 18 * 3), 
 		quit_action, 
 		text_buffer,
 		false

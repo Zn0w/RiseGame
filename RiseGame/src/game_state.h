@@ -7,5 +7,6 @@ enum GameState
 	Pause,
 	Guide,
 	Saving,
+	Settings,
 	Quit
 };

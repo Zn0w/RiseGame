@@ -24,3 +24,8 @@ void main_menu_action(GameState* state)
 {
 	*state = Main;
 }
+
+void settings_action(GameState* state)
+{
+	*state = Settings;
+}
