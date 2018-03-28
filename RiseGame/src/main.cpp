@@ -16,9 +16,7 @@
 bool game_running = false;
 GameState current_state;
 
-//void running_update(std::vector<Entity*>*, float); // Update function for Running state
 void menu_update(std::vector<Button*>*); // Update function for Main and Pause state
-void guide_update(); // Update fucntion for Guide state
 
 void destroy(sf::RenderWindow*);
 
@@ -274,7 +272,16 @@ int main()
 		}
 		else if (current_state == Guide)
 		{
-			guide_update();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+			{
+				// Wait for player to release a Return key
+				while (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+				{
+
+				}
+
+				current_state = Main;
+			}
 			render_text(&window, guide_test);
 		}
 		else if (current_state == Quit)
@@ -288,53 +295,6 @@ int main()
 
 	return 0;
 }
-
-/*void running_update(std::vector<Entity*>* entities, float t)
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-	{
-		current_state = Pause;
-	}
-
-	for (Entity* entity : *entities)
-	{
-		if (entity->active && entity->type == Player)
-		{
-			// Keyboard input handling
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			{
-				entity->dimensions.x -= 1.0f * t;
-				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			{
-				entity->dimensions.x += 1.0f * t;
-				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-			{
-				entity->dimensions.y -= 1.0f * t;
-				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-			{
-				entity->dimensions.y += 1.0f * t;
-				entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-			}
-
-			for (Entity* other_entity : *entities)
-			{
-				if (other_entity->type == Decor_object && areColliding(entity->dimensions, other_entity->dimensions))
-				{
-					laser
-				}
-			}
-		}
-	}
-}*/
 
 void menu_update(std::vector<Button*>* buttons)
 {
@@ -396,21 +356,6 @@ void menu_update(std::vector<Button*>* buttons)
 		}
 	}
 }
-
-void guide_update()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-	{
-		// Wait for player to release a Return key
-		while (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-		{
-
-		}
-
-		current_state = Main;
-	}
-}
-
 
 void destroy(sf::RenderWindow* window)
 {
