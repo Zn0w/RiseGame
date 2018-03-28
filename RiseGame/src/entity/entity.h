@@ -18,7 +18,8 @@ struct Dimensions
 enum EntityType
 {
 	Player,
-	Decor_object
+	
+	Ground_grass
 };
 
 struct Entity

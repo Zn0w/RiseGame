@@ -2,4 +2,4 @@
 
 #include "../entity/entity.h"
 
-bool areColliding(Dimensions e1, Dimensions e2);
+bool are_colliding(Dimensions e1, Dimensions e2);

@@ -8,11 +8,10 @@
 #include "game_state.h"
 
 #include "entity/entity.h"
+#include "entity/update.h"
 
 #include "button/button.h"
 #include "button/events.h"
-
-#include "collision_detection/collision.h"
 
 bool game_running = false;
 GameState current_state;
@@ -28,16 +27,10 @@ int main()
 	window.setVerticalSyncEnabled(true);
 	sf::Clock clock;
 
-	std::vector<Entity*> entities;
-	std::vector<Button*> main_menu;
-	std::vector<Button*> pause_menu;
-
 	// Init game before main loop
 
 	game_running = true;
 	current_state = Main;
-
-	entities.reserve(2);
 
 
 	// Game font init
@@ -55,6 +48,8 @@ int main()
 	sf::Text text_buffer;
 	text_buffer.setFont(font);
 	text_buffer.setCharacterSize(34);
+
+	std::vector<Button*> main_menu;
 
 	// Play button
 	text_buffer.setString("Play!");
@@ -94,6 +89,8 @@ int main()
 
 
 	// Pause menu elements init
+
+	std::vector<Button*> pause_menu;
 
 	// Go back to the game button
 	text_buffer.setString("Go back to the game");
@@ -138,7 +135,12 @@ int main()
 
 	// Game entities init
 
+
+	std::vector<Entity*> entities;
+
+
 	sf::Sprite sprite_buffer;
+
 
 	// Background init
 	sf::Texture background_texture;
@@ -148,7 +150,7 @@ int main()
 	}
 	sprite_buffer.setTexture(background_texture);
 
-	entities.push_back(new Entity(Dimensions(0, 0, 1280, 720), Decor_object, sprite_buffer, NULL));
+	entities.push_back(new Entity(Dimensions(0, 0, 1280, 720), Ground_grass, sprite_buffer, NULL));
 
 	// Player init
 	sf::Texture player_texture;
@@ -158,19 +160,7 @@ int main()
 	}
 	sprite_buffer.setTexture(player_texture);
 
-	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, sprite_buffer, NULL));
-
-
-	// Doesn't work
-	
-	// Sound effects init
-
-	// Test sound
-	//sf::Sound buffer;
-	//if (!sound_buffer.loadFromFile("laser.wav"))
-		//std::cout << "Couldn't load laser sound effect." << std::endl;
-	//sf::Sound laser_sound;
-	//laser_sound.setBuffer(sound_buffer);
+	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, sprite_buffer, player_update));
 
 
 	// Main game loop
@@ -200,45 +190,10 @@ int main()
 
 			for (Entity* entity : entities)
 			{
-				if (entity->active && entity->type == Player)
-				{
-					// Keyboard input handling
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-					{
-						entity->dimensions.x -= 1.0f * time;
-						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-					}
-
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-					{
-						entity->dimensions.x += 1.0f * time;
-						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-					}
-
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-					{
-						entity->dimensions.y -= 1.0f * time;
-						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-					}
-
-					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-					{
-						entity->dimensions.y += 1.0f * time;
-						entity->sprite.setPosition(entity->dimensions.x, entity->dimensions.y);
-					}
-
-					for (Entity* other_entity : entities)
-					{
-						if (other_entity->type == Decor_object && areColliding(entity->dimensions, other_entity->dimensions))
-						{
-							// Doesn't work
-							//laser_sound.play();
-							//laser_sound.stop();
-						}
-					}
-				}
+				if (entity->update != NULL)
+					entity->update(entity, &entities, time);
 			}
-			render_update(&window, &entities);
+			render_entities(&window, &entities);
 		}
 		else if (current_state == Main)
 		{

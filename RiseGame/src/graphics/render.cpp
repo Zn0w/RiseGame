@@ -1,6 +1,6 @@
 #include "render.h"
 
-void render_update(sf::RenderWindow* window, std::vector<Entity*>* entities)
+void render_entities(sf::RenderWindow* window, std::vector<Entity*>* entities)
 {
 	window->clear();
 	// Todo: don't render if entity is not within camera region
