@@ -8,10 +8,11 @@
 #include "game_state.h"
 
 #include "entity/entity.h"
-#include "entity/update.h"
 
 #include "button/button.h"
 #include "button/events.h"
+
+#include "collision_detection/collision.h"
 
 bool game_running = false;
 GameState current_state;
@@ -51,47 +52,42 @@ int main()
 
 	// Main menu elements init
 
+	sf::Text text_buffer;
+	text_buffer.setFont(font);
+	text_buffer.setCharacterSize(34);
+
 	// Play button
-	sf::Text play_txt;
-	play_txt.setFont(font);
-	play_txt.setCharacterSize(34);
-	play_txt.setString("Play!");
+	text_buffer.setString("Play!");
 	main_menu.push_back(new Button(
 		
 		window_size.x / 16, 
 		window_size.y / 9 * 6, 
 		play_action, 
-		play_txt, 
+		text_buffer,
 		true
 
 	));
 
 	// Guide button
-	sf::Text guide_txt;
-	guide_txt.setFont(font);
-	guide_txt.setCharacterSize(34);
-	guide_txt.setString("See guide");
+	text_buffer.setString("See guide");
 	main_menu.push_back(new Button(
 		
 		window_size.x / 16, 
 		(window_size.y / 9 * 6) + (window_size.y / 18), 
 		guide_action, 
-		guide_txt, 
+		text_buffer,
 		false
 
 	));
 
 	// Quit button
-	sf::Text quit_txt;
-	quit_txt.setFont(font);
-	quit_txt.setCharacterSize(34);
-	quit_txt.setString("Quit");
+	text_buffer.setString("Quit");
 	main_menu.push_back(new Button(
 		
 		window_size.x / 16, 
 		(window_size.y / 9 * 6) + (window_size.y / 18 * 2), 
 		quit_action, 
-		quit_txt, 
+		text_buffer,
 		false
 
 	));
@@ -100,56 +96,44 @@ int main()
 	// Pause menu elements init
 
 	// Go back to the game button
-	sf::Text back_txt;
-	back_txt.setFont(font);
-	back_txt.setCharacterSize(34);
-	back_txt.setString("Go back to the game");
+	text_buffer.setString("Go back to the game");
 	pause_menu.push_back(new Button(
 
 		window_size.x / 16,
 		window_size.y / 9 * 6,
 		play_action, 
-		back_txt, 
+		text_buffer,
 		true
 
 	));
 
 	// Save button
-	sf::Text save_txt;
-	save_txt.setFont(font);
-	save_txt.setCharacterSize(34);
-	save_txt.setString("Save the game");
+	text_buffer.setString("Save the game");
 	pause_menu.push_back(new Button(
 		
 		window_size.x / 16,
 		(window_size.y / 9 * 6) + (window_size.y / 18),
 		save_action, 
-		save_txt, 
+		text_buffer,
 		false
 	
 	));
 
 	// Go to the main menu button
-	sf::Text go_main_txt;
-	go_main_txt.setFont(font);
-	go_main_txt.setCharacterSize(34);
-	go_main_txt.setString("Go to the main menu");
+	text_buffer.setString("Go to the main menu");
 	pause_menu.push_back(new Button(
 		
 		window_size.x / 16,
 		(window_size.y / 9 * 6) + (window_size.y / 18 * 2),
 		main_menu_action, 
-		go_main_txt, 
+		text_buffer,
 		false
 	
 	));
 
 
 	// Guide window assets init
-	sf::Text guide_test;
-	guide_test.setFont(font);
-	guide_test.setCharacterSize(34);
-	guide_test.setString("This is guide. Press return to go back to the main menu.");
+	text_buffer.setString("This is guide. Press return to go back to the main menu.");
 
 
 	// Game entities init
@@ -174,7 +158,7 @@ int main()
 	sf::Sprite player_sprite;
 	player_sprite.setTexture(player_texture);
 
-	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, player_sprite, player_update));
+	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, player_sprite, NULL));
 
 
 	// Doesn't work
@@ -282,7 +266,7 @@ int main()
 
 				current_state = Main;
 			}
-			render_text(&window, guide_test);
+			render_text(&window, text_buffer);
 		}
 		else if (current_state == Quit)
 		{
