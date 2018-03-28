@@ -174,6 +174,16 @@ int main()
 
 	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, sprite_buffer, player_update));
 
+	// Collision test signal init
+	sf::Texture signal_texture;
+	if (!signal_texture.loadFromFile("resources/textures/red_light.png"))
+	{
+		std::cout << "Couldn't load red signal texture from file." << std::endl;
+	}
+	sprite_buffer.setTexture(signal_texture);
+
+	entities.push_back(new Entity(Dimensions(1500, 800, 300, 300), Test_object, sprite_buffer, NULL));
+
 
 	// Main game loop
 
@@ -234,6 +244,10 @@ int main()
 				current_state = Main;
 			}
 			render_text(&window, text_buffer);
+		}
+		else if (current_state == Settings)
+		{
+			// Open settings menu
 		}
 		else if (current_state == Quit)
 		{

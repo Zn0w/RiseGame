@@ -19,7 +19,9 @@ enum EntityType
 {
 	Player,
 	
-	Ground_grass
+	Ground_grass,
+
+	Test_object
 };
 
 struct Entity

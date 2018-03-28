@@ -27,9 +27,13 @@ void player_update(Entity* self, std::vector<Entity*>* entities, float t)
 		self->sprite.setPosition(self->dimensions.x, self->dimensions.y);
 	}
 
+	bool collide;
 	for (Entity* entity : *entities)
 	{
-		if (entity->type == Ground_grass && are_colliding(self->dimensions, entity->dimensions))
-			std::cout << "Player and backround are colliding!" << std::endl;
+		if (entity->type == Ground_grass)
+			collide = are_colliding(self->dimensions, entity->dimensions);
+
+		if (entity->type == Test_object)
+			entity->active = collide;
 	}
 }
