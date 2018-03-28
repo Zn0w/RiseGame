@@ -138,16 +138,17 @@ int main()
 
 	// Game entities init
 
+	sf::Sprite sprite_buffer;
+
 	// Background init
-	sf::Texture ground_texture;
-	if (!ground_texture.loadFromFile("resources/textures/grass_background.png"))
+	sf::Texture background_texture;
+	if (!background_texture.loadFromFile("resources/textures/grass_background.png"))
 	{
 		std::cout << "Couldn't load grass texture from file." << std::endl;
 	}
-	sf::Sprite ground_sprite;
-	ground_sprite.setTexture(ground_texture);
+	sprite_buffer.setTexture(background_texture);
 
-	entities.push_back(new Entity(Dimensions(0, 0, 1280, 720), Decor_object, ground_sprite, NULL));
+	entities.push_back(new Entity(Dimensions(0, 0, 1280, 720), Decor_object, sprite_buffer, NULL));
 
 	// Player init
 	sf::Texture player_texture;
@@ -155,10 +156,9 @@ int main()
 	{
 		std::cout << "Couldn't load player texture from file." << std::endl;
 	}
-	sf::Sprite player_sprite;
-	player_sprite.setTexture(player_texture);
+	sprite_buffer.setTexture(player_texture);
 
-	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, player_sprite, NULL));
+	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, sprite_buffer, NULL));
 
 
 	// Doesn't work
