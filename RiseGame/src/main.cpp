@@ -20,6 +20,8 @@ void menu_update(std::vector<Button*>*); // Update function for Main and Pause s
 
 void destroy(sf::RenderWindow*);
 
+sf::Texture load_texture(const char*);
+
 
 int main()
 {
@@ -325,4 +327,18 @@ void menu_update(std::vector<Button*>* buttons)
 void destroy(sf::RenderWindow* window)
 {
 	window->close();
+}
+
+sf::Texture load_texture(const char* texture_path)
+{
+	sf::Texture texture;
+	if (!texture.loadFromFile(texture_path))
+	{
+		
+	}
+	else
+	{
+		texture.create(0, 0);
+	}
+	return texture;
 }
