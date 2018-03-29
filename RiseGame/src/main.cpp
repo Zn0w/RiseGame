@@ -13,6 +13,8 @@
 #include "button/button.h"
 #include "button/events.h"
 
+#include "save_load_operations/save_load_gamedata.h"
+
 bool game_running = false;
 GameState current_state;
 
@@ -154,6 +156,12 @@ int main()
 
 
 	sf::Sprite sprite_buffer;
+
+	std::vector<Entity_data> entity_data = load_entities_data("gamedata/level1.txt");
+	for (Entity_data data : entity_data)
+	{
+		std::cout << data.type << std::endl;
+	}
 
 
 	// Background init
