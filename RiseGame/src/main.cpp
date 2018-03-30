@@ -15,6 +15,8 @@
 
 #include "save_load_operations/save_load_gamedata.h"
 
+#include "console/console.h"
+
 bool game_running = false;
 GameState current_state;
 
@@ -46,6 +48,12 @@ int main()
 
 	sf::Vector2u window_size = window.getSize();
 
+
+	// Console text init
+	console::console_log.setFont(font);
+	console::console_log.setCharacterSize(28);
+	console::console_log.setFillColor(sf::Color::Blue);
+	console::console_log.setPosition(window_size.x / 16 * 10, window_size.y / 9);
 
 	// Main menu elements init
 
@@ -146,7 +154,7 @@ int main()
 
 
 	// Guide window assets init
-	text_buffer.setString("This is guide. Press return to go back to the main menu.");
+	text_buffer.setString("This is guide. Press return to go back to the main menu. \n Press ctrl + D to go to the dev mode.");
 
 
 	// Game entities init

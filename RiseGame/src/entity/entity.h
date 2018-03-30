@@ -4,6 +4,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../console/console.h"
+
 struct Dimensions
 {
 	float x, y, width, height;
@@ -40,11 +42,12 @@ struct Entity
 			(double) ((double) dimensions.width / sprite.getTexture()->getSize().x),
 			(double) ((double) dimensions.height / sprite.getTexture()->getSize().y)
 		);*/
-		/*sprite.setScale(
+		sprite.setScale(
 			dimensions.width / sprite.getTexture()->getSize().x,
 			dimensions.height / sprite.getTexture()->getSize().y
-		);*/
+		);
 
+		console::print("Sprite scale: " + std::to_string(sprite.getScale().x) + " | " + std::to_string(sprite.getScale().y));
 		//std::cout << "Sprite scale: " << sprite.getScale().x << " | " << sprite.getScale().y << std::endl;
 	}
 };
