@@ -166,6 +166,9 @@ int main()
 	std::map<std::string, sf::Texture> textures = load_textures("resources/levels/level_1/textures.txt");
 	std::vector<Entity_data> entity_data = load_entities_data("resources/levels/level_1/entities.txt");
 
+	// Vector usage optimization
+	entities.reserve(entity_data.size());
+
 	for (Entity_data data : entity_data)
 	{
 		std::cout << data.type << std::endl;
@@ -184,15 +187,15 @@ int main()
 		if (data.type == "Ground_grass")
 		{
 			std::cout << data.w / 2 << std::endl;
-			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Ground_grass, entity_sprite, NULL));
+			entities.emplace_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Ground_grass, entity_sprite, NULL));
 		}
 		else if (data.type == "Player")
 		{
-			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Player, entity_sprite, player_update));
+			entities.emplace_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Player, entity_sprite, player_update));
 		}
 		else if (data.type == "Test_object")
 		{
-			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Test_object, entity_sprite, NULL));
+			entities.emplace_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Test_object, entity_sprite, NULL));
 		}
 	}
 
