@@ -22,7 +22,7 @@ void menu_update(std::vector<Button*>*); // Update function for Main and Pause s
 
 void destroy(sf::RenderWindow*);
 
-sf::Texture load_texture(const char*);
+sf::Sprite load_texture(std::string, float, float);
 
 
 int main()
@@ -157,17 +157,34 @@ int main()
 
 	sf::Sprite sprite_buffer;
 
-	/*std::vector<Entity_data> entity_data = load_entities_data("gamedata/level1.txt");
+	std::vector<Entity_data> entity_data = load_entities_data("resources/levels/level_1.txt");
 	for (Entity_data data : entity_data)
 	{
+		std::cout << data.type << std::endl;
+		std::cout << data.texture_path << std::endl;
+		std::cout << data.x << std::endl;
+		std::cout << data.y << std::endl;
+		std::cout << data.w << std::endl;
+		std::cout << data.h << std::endl;
+		
+		sf::Sprite entity_sprite = load_texture("resources/textures/" + data.texture_path, data.w, data.h);
+
 		if (data.type == "Ground_grass")
 		{
-
+			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Ground_grass, entity_sprite, NULL));
 		}
-	}*/
+		else if (data.type == "Player")
+		{
+			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Player, entity_sprite, player_update));
+		}
+		else if (data.type == "Test_object")
+		{
+			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Test_object, entity_sprite, NULL));
+		}
+	}
 
 
-	// Background init
+	/*// Background init
 	sf::Texture background_texture;
 	if (!background_texture.loadFromFile("resources/textures/grass_background.png"))
 	{
@@ -195,7 +212,7 @@ int main()
 	}
 	sprite_buffer.setTexture(signal_texture);
 
-	entities.push_back(Entity(Dimensions(1500, 800, 300, 300), Test_object, sprite_buffer, NULL));
+	entities.push_back(Entity(Dimensions(1500, 800, 300, 300), Test_object, sprite_buffer, NULL));*/
 
 
 	// Main game loop
@@ -341,16 +358,25 @@ void destroy(sf::RenderWindow* window)
 	window->close();
 }
 
-sf::Texture load_texture(const char* texture_path)
+sf::Sprite load_texture(std::string texture_path, float width, float height)
 {
+	sf::Sprite sprite;
 	sf::Texture texture;
+
 	if (!texture.loadFromFile(texture_path))
 	{
-		
+		std::cout << "Couldn't load " << texture_path << " texture from file." << std::endl;
+
+		texture.create(width, height);
+
+		// If texture couldn't load, then set a green texture
+		sprite.setTexture(texture);
+		sprite.setColor(sf::Color::Green);
+
+		return sprite;
 	}
-	else
-	{
-		texture.create(0, 0);
-	}
-	return texture;
+
+	sprite.setTexture(texture);
+
+	return sprite;
 }
