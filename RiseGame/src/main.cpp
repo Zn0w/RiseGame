@@ -180,9 +180,17 @@ int main()
 		
 		sf::Sprite entity_sprite;
 
-		entity_sprite.setTexture(textures.at(data.texture_path));
+		// if texture wasn't loaded, then load error texture
 
-		//@TODO: if texture is null, then load it plain green
+		if (textures.at(data.texture_path).getSize().x == 0)
+		{
+			sf::Texture error_texture;
+			error_texture.create(100, 100);
+			entity_sprite.setTexture(error_texture);
+			entity_sprite.setColor(sf::Color::Green);
+		}
+		else
+			entity_sprite.setTexture(textures.at(data.texture_path));
 
 		if (data.type == "Ground_grass")
 		{
@@ -196,6 +204,10 @@ int main()
 		else if (data.type == "Test_object")
 		{
 			entities.emplace_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Test_object, entity_sprite, NULL));
+		}
+		else if (data.type == "Decor_small_object")
+		{
+			entities.emplace_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Decor_small_object, entity_sprite, NULL));
 		}
 	}
 

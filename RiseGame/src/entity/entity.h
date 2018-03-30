@@ -23,7 +23,9 @@ enum EntityType
 	
 	Ground_grass,
 
-	Test_object
+	Test_object,
+
+	Decor_small_object
 };
 
 struct Entity
