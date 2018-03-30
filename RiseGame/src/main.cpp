@@ -24,8 +24,6 @@ void menu_update(std::vector<Button*>*); // Update function for Main and Pause s
 
 void destroy(sf::RenderWindow*);
 
-sf::Sprite load_texture(std::string, float, float);
-
 
 int main()
 {
@@ -163,9 +161,26 @@ int main()
 	std::vector<Entity> entities;
 
 
-	sf::Sprite sprite_buffer;
+	//sf::Sprite sprite_buffer;
 
-	std::vector<Entity_data> entity_data = load_entities_data("resources/levels/level_1.txt");
+	std::map<std::string, sf::Texture> textures = load_textures("resources/levels/level_1/textures.txt");
+	std::vector<Entity_data> entity_data = load_entities_data("resources/levels/level_1/entities.txt");
+
+	// This datatype is exceptional, because it describes general info about the level:
+	// how many textures needs to be load for this level, boundries for the level.
+	/*Entity_data level_data = entity_data.at(0);
+	int num_of_textures = level_data.x;
+	float level_width = level_data.w;
+	float level_height = level_data.h;*/
+
+	//std::vector<sf::Texture> textures;
+	//textures.reserve(num_of_textures);
+
+	//for (int i = 0; i < num_of_textures; i++)
+		//textures.emplace_back(sf::Texture());
+	sf::Texture* texture;
+
+	//int i = 0;
 	for (Entity_data data : entity_data)
 	{
 		std::cout << data.type << std::endl;
@@ -175,10 +190,32 @@ int main()
 		std::cout << data.w << std::endl;
 		std::cout << data.h << std::endl;
 		
-		sf::Sprite entity_sprite = load_texture("resources/textures/" + data.texture_path, data.w, data.h);
+		sf::Sprite entity_sprite;
+
+		//sf::Texture* texture = &textures.at(i);
+		//i++;
+
+		/*if (!texture->loadFromFile("resource/textures/" + data.texture_path))
+		{
+			std::cout << "Couldn't load " << data.texture_path << " texture from file." << std::endl;
+
+			texture->create(data.w, data.h);
+
+			// If texture couldn't load, then set a green texture
+			entity_sprite.setColor(sf::Color::Green);
+		}*/
+
+		//entity_sprite.setTexture(*texture);
+
+		//texture = new sf::Texture();
+		//texture->create(data.w, data.h);
+
+		entity_sprite.setTexture(textures.at(data.texture_path));
+		//entity_sprite.setColor(sf::Color::Green);
 
 		if (data.type == "Ground_grass")
 		{
+			std::cout << data.w / 2 << std::endl;
 			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Ground_grass, entity_sprite, NULL));
 		}
 		else if (data.type == "Player")
@@ -364,27 +401,4 @@ void menu_update(std::vector<Button*>* buttons)
 void destroy(sf::RenderWindow* window)
 {
 	window->close();
-}
-
-sf::Sprite load_texture(std::string texture_path, float width, float height)
-{
-	sf::Sprite sprite;
-	sf::Texture texture;
-
-	if (!texture.loadFromFile(texture_path))
-	{
-		std::cout << "Couldn't load " << texture_path << " texture from file." << std::endl;
-
-		texture.create(width, height);
-
-		// If texture couldn't load, then set a green texture
-		sprite.setTexture(texture);
-		sprite.setColor(sf::Color::Green);
-
-		return sprite;
-	}
-
-	sprite.setTexture(texture);
-
-	return sprite;
 }

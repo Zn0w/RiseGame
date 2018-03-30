@@ -44,3 +44,29 @@ void save_entities_data(std::vector<Entity_data> entities_data)
 {
 	
 }
+
+std::map<std::string, sf::Texture> load_textures(std::string filepath)
+{
+	std::map<std::string, sf::Texture> textures;
+	std::string line;
+	std::ifstream file_reader(filepath);
+
+	if (file_reader.is_open())
+	{
+		while (getline(file_reader, line))
+		{
+			sf::Texture texture;
+			if (!texture.loadFromFile("resources/textures/" + line))
+			{
+				std::cout << "Failed to open file " << filepath << std::endl;
+			}
+			
+			textures[line] = texture;
+		}
+		file_reader.close();
+	}
+	else
+		std::cout << "Failed to open file " << filepath << std::endl;
+
+	return textures;
+}

@@ -4,6 +4,9 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <map>
+
+#include <SFML/Graphics.hpp>
 
 struct Entity_data
 {
@@ -17,6 +20,8 @@ struct Entity_data
 
 	}
 };
+
+std::map<std::string, sf::Texture> load_textures(std::string);
 
 std::vector<Entity_data> load_entities_data(const char*);
 
