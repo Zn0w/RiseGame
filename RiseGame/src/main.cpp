@@ -152,16 +152,19 @@ int main()
 	// Game entities init
 
 
-	std::vector<Entity*> entities;
+	std::vector<Entity> entities;
 
 
 	sf::Sprite sprite_buffer;
 
-	std::vector<Entity_data> entity_data = load_entities_data("gamedata/level1.txt");
+	/*std::vector<Entity_data> entity_data = load_entities_data("gamedata/level1.txt");
 	for (Entity_data data : entity_data)
 	{
-		std::cout << data.type << std::endl;
-	}
+		if (data.type == "Ground_grass")
+		{
+
+		}
+	}*/
 
 
 	// Background init
@@ -172,7 +175,7 @@ int main()
 	}
 	sprite_buffer.setTexture(background_texture);
 
-	entities.push_back(new Entity(Dimensions(0, 0, 1280, 720), Ground_grass, sprite_buffer, NULL));
+	entities.push_back(Entity(Dimensions(0, 0, 1280, 720), Ground_grass, sprite_buffer, NULL));
 
 	// Player init
 	sf::Texture player_texture;
@@ -182,7 +185,7 @@ int main()
 	}
 	sprite_buffer.setTexture(player_texture);
 
-	entities.push_back(new Entity(Dimensions(400, 350, 186, 312), Player, sprite_buffer, player_update));
+	entities.push_back(Entity(Dimensions(400, 350, 186, 312), Player, sprite_buffer, player_update));
 
 	// Collision test signal init
 	sf::Texture signal_texture;
@@ -192,7 +195,7 @@ int main()
 	}
 	sprite_buffer.setTexture(signal_texture);
 
-	entities.push_back(new Entity(Dimensions(1500, 800, 300, 300), Test_object, sprite_buffer, NULL));
+	entities.push_back(Entity(Dimensions(1500, 800, 300, 300), Test_object, sprite_buffer, NULL));
 
 
 	// Main game loop
@@ -220,8 +223,9 @@ int main()
 				current_state = Pause;
 			}
 
-			for (Entity* entity : entities)
+			for (int i = 0; i < entities.size(); i++)
 			{
+				Entity* entity = &entities.at(i);
 				if (entity->update != NULL)
 					entity->update(entity, &entities, time);
 			}

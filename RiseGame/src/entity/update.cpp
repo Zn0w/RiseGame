@@ -1,6 +1,6 @@
 #include "update.h"
 
-void player_update(Entity* self, std::vector<Entity*>* entities, float t)
+void player_update(Entity* self, std::vector<Entity>* entities, float t)
 {
 	// Keyboard input handling
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -28,8 +28,9 @@ void player_update(Entity* self, std::vector<Entity*>* entities, float t)
 	}
 
 	bool collide;
-	for (Entity* entity : *entities)
+	for (int i = 0; i < entities->size(); i++)
 	{
+		Entity* entity = &entities->at(i);
 		if (entity->type == Ground_grass)
 			collide = are_colliding(self->dimensions, entity->dimensions);
 

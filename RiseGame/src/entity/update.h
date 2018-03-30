@@ -6,4 +6,4 @@
 
 #include <iostream>
 
-void player_update(Entity*, std::vector<Entity*>*, float);
+void player_update(Entity*, std::vector<Entity>*, float);
