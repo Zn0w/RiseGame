@@ -166,21 +166,6 @@ int main()
 	std::map<std::string, sf::Texture> textures = load_textures("resources/levels/level_1/textures.txt");
 	std::vector<Entity_data> entity_data = load_entities_data("resources/levels/level_1/entities.txt");
 
-	// This datatype is exceptional, because it describes general info about the level:
-	// how many textures needs to be load for this level, boundries for the level.
-	/*Entity_data level_data = entity_data.at(0);
-	int num_of_textures = level_data.x;
-	float level_width = level_data.w;
-	float level_height = level_data.h;*/
-
-	//std::vector<sf::Texture> textures;
-	//textures.reserve(num_of_textures);
-
-	//for (int i = 0; i < num_of_textures; i++)
-		//textures.emplace_back(sf::Texture());
-	sf::Texture* texture;
-
-	//int i = 0;
 	for (Entity_data data : entity_data)
 	{
 		std::cout << data.type << std::endl;
@@ -192,26 +177,9 @@ int main()
 		
 		sf::Sprite entity_sprite;
 
-		//sf::Texture* texture = &textures.at(i);
-		//i++;
-
-		/*if (!texture->loadFromFile("resource/textures/" + data.texture_path))
-		{
-			std::cout << "Couldn't load " << data.texture_path << " texture from file." << std::endl;
-
-			texture->create(data.w, data.h);
-
-			// If texture couldn't load, then set a green texture
-			entity_sprite.setColor(sf::Color::Green);
-		}*/
-
-		//entity_sprite.setTexture(*texture);
-
-		//texture = new sf::Texture();
-		//texture->create(data.w, data.h);
-
 		entity_sprite.setTexture(textures.at(data.texture_path));
-		//entity_sprite.setColor(sf::Color::Green);
+
+		//@TODO: if texture is null, then load it plain green
 
 		if (data.type == "Ground_grass")
 		{
@@ -227,37 +195,6 @@ int main()
 			entities.push_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Test_object, entity_sprite, NULL));
 		}
 	}
-
-
-	/*// Background init
-	sf::Texture background_texture;
-	if (!background_texture.loadFromFile("resources/textures/grass_background.png"))
-	{
-		std::cout << "Couldn't load grass texture from file." << std::endl;
-	}
-	sprite_buffer.setTexture(background_texture);
-
-	entities.push_back(Entity(Dimensions(0, 0, 1280, 720), Ground_grass, sprite_buffer, NULL));
-
-	// Player init
-	sf::Texture player_texture;
-	if (!player_texture.loadFromFile("resources/textures/mario_player.png"))
-	{
-		std::cout << "Couldn't load player texture from file." << std::endl;
-	}
-	sprite_buffer.setTexture(player_texture);
-
-	entities.push_back(Entity(Dimensions(400, 350, 186, 312), Player, sprite_buffer, player_update));
-
-	// Collision test signal init
-	sf::Texture signal_texture;
-	if (!signal_texture.loadFromFile("resources/textures/red_light.png"))
-	{
-		std::cout << "Couldn't load red signal texture from file." << std::endl;
-	}
-	sprite_buffer.setTexture(signal_texture);
-
-	entities.push_back(Entity(Dimensions(1500, 800, 300, 300), Test_object, sprite_buffer, NULL));*/
 
 
 	// Main game loop

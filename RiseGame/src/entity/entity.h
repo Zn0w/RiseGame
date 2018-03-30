@@ -38,10 +38,6 @@ struct Entity
 		: dimensions(d), type(t), sprite(s), active(true), update(update_func)
 	{	
 		sprite.setPosition(dimensions.x, dimensions.y);
-		/*sprite.setScale(
-			(double) ((double) dimensions.width / sprite.getTexture()->getSize().x),
-			(double) ((double) dimensions.height / sprite.getTexture()->getSize().y)
-		);*/
 		sprite.setScale(
 			dimensions.width / sprite.getTexture()->getSize().x,
 			dimensions.height / sprite.getTexture()->getSize().y
