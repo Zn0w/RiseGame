@@ -5,7 +5,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "../console/console.h"
-sf::Text console_log;
 
 struct Dimensions
 {

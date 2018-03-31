@@ -16,7 +16,6 @@
 #include "save_load_operations/save_load_gamedata.h"
 
 #include "console/console.h"
-sf::Text console_log;
 
 bool game_running = false;
 GameState current_state;
@@ -51,11 +50,11 @@ int main()
 
 
 	// Console text init
-	console_log.setFont(font);
-	console_log.setCharacterSize(28);
-	console_log.setFillColor(sf::Color::Blue);
-	console_log.setPosition(window_size.x / 16 * 2, window_size.y / 9);
-	console_log.setString("Testing");
+	console::console_log.setFont(font);
+	console::console_log.setCharacterSize(28);
+	console::console_log.setFillColor(sf::Color::Blue);
+	console::console_log.setPosition(window_size.x / 16 * 2, window_size.y / 9);
+	console::console_log.setString("Testing");
 
 	// Main menu elements init
 

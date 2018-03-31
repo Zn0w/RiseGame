@@ -28,6 +28,5 @@ void render_text(sf::RenderWindow* window, sf::Text text)
 {
 	window->clear();
 	window->draw(text);
-	window->draw(console::console_log);
 	window->display();
 }
