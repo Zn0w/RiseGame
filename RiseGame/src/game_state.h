@@ -8,5 +8,6 @@ enum GameState
 	Guide,
 	Saving,
 	Settings,
-	Quit
+	Quit,
+	Console
 };

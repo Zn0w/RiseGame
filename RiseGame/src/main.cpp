@@ -16,9 +16,12 @@
 #include "save_load_operations/save_load_gamedata.h"
 
 #include "console/console.h"
+sf::Text console_log;
 
 bool game_running = false;
 GameState current_state;
+
+bool show_console = false;
 
 void menu_update(std::vector<Button*>*); // Update function for Main and Pause state
 
@@ -48,10 +51,11 @@ int main()
 
 
 	// Console text init
-	console::console_log.setFont(font);
-	console::console_log.setCharacterSize(28);
-	console::console_log.setFillColor(sf::Color::Blue);
-	console::console_log.setPosition(window_size.x / 16 * 10, window_size.y / 9);
+	console_log.setFont(font);
+	console_log.setCharacterSize(28);
+	console_log.setFillColor(sf::Color::Blue);
+	console_log.setPosition(window_size.x / 16 * 2, window_size.y / 9);
+	console_log.setString("Testing");
 
 	// Main menu elements init
 
@@ -267,6 +271,14 @@ int main()
 			{
 				current_state = Pause;
 			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Tilde))
+			{
+				show_console = true;
+			}
+			else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Tilde) && show_console)
+			{
+				current_state = Console;
+			}
 
 			for (int i = 0; i < entities.size(); i++)
 			{
@@ -312,6 +324,21 @@ int main()
 		{
 			game_running = false;
 			// Todo: ask user wether they want to save the game or not
+		}
+		else if (current_state == Console)
+		{
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Tilde))
+			{
+				while (sf::Keyboard::isKeyPressed(sf::Keyboard::Tilde))
+				{
+
+				}
+				
+				show_console = false;
+				current_state = Running;
+			}
+
+			render_text(&window, console::console_log);
 		}
 	}
 

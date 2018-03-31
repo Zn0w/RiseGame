@@ -6,7 +6,7 @@
 
 namespace console
 {
-	static sf::Text console_log;
+	extern sf::Text console_log;
 	
 	void print(std::string);
 }

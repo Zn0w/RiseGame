@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "../console/console.h"
+sf::Text console_log;
 
 struct Dimensions
 {
@@ -45,7 +46,7 @@ struct Entity
 			dimensions.height / sprite.getTexture()->getSize().y
 		);
 		
-		//console::print("Sprite scale: " + std::to_string(sprite.getScale().x) + " | " + std::to_string(sprite.getScale().y));
+		console::print("Sprite scale: " + std::to_string(sprite.getScale().x) + " | " + std::to_string(sprite.getScale().y));
 		std::cout << "Sprite scale: " << sprite.getScale().x << " | " << sprite.getScale().y << std::endl;
 	}
 };
