@@ -50,11 +50,17 @@ int main()
 
 
 	// Console text init
-	console::console_log.setFont(font);
-	console::console_log.setCharacterSize(28);
+	sf::Font console_font;
+	if (!console_font.loadFromFile("resources/font/consola.ttf"))
+	{
+		std::cout << "Couldn't load a console font." << std::endl;
+	}
+	
+	console::console_log.setFont(console_font);
+	console::console_log.setCharacterSize(20);
 	console::console_log.setFillColor(sf::Color::Blue);
 	console::console_log.setPosition(window_size.x / 16 * 2, window_size.y / 9);
-	console::console_log.setString("Testing");
+	console::console_log.setString("Console log: \n");
 
 	// Main menu elements init
 
@@ -243,6 +249,15 @@ int main()
 		{
 			entities.emplace_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Decor_small_object, entity_sprite, NULL));
 		}
+
+		console::print(
+			"Entity created: type: " + data.type 
+			+ "  |  texture: " + data.texture_path 
+			+ "  |  dimensions: x" + std::to_string(data.x) 
+			+ " y" + std::to_string(data.y)
+			+ " w" + std::to_string(data.w)
+			+ " h" + std::to_string(data.h) + "\n"
+		);
 	}
 
 

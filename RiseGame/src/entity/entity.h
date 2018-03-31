@@ -45,7 +45,6 @@ struct Entity
 			dimensions.height / sprite.getTexture()->getSize().y
 		);
 		
-		console::print("Sprite scale: " + std::to_string(sprite.getScale().x) + " | " + std::to_string(sprite.getScale().y));
-		std::cout << "Sprite scale: " << sprite.getScale().x << " | " << sprite.getScale().y << std::endl;
+		console::print("Entity's sprite scale: " + std::to_string(sprite.getScale().x) + " | " + std::to_string(sprite.getScale().y) + "\n");
 	}
 };

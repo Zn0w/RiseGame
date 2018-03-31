@@ -33,9 +33,17 @@ std::vector<Entity_data> load_entities_data(const char* filepath)
 			));
 		}
 		file_reader.close();
+
+		console::print("Successfully processed file: ");
+		console::print(filepath);
+		console::print("\n");
 	}
 	else
-		std::cout << "Failed to open file " << filepath << std::endl;
+	{
+		console::print("Failed to open file: ");
+		console::print(filepath);
+		console::print("\n");
+	}
 
 	return entity_data;
 }
@@ -58,15 +66,25 @@ std::map<std::string, sf::Texture> load_textures(std::string filepath)
 			sf::Texture texture;
 			if (!texture.loadFromFile("resources/textures/" + line))
 			{
-				std::cout << "Failed to open file " << filepath << std::endl;
+				console::print("Failed to load texture: ");
+				console::print(line);
+				console::print("\n");
 			}
 			
 			textures[line] = texture;
 		}
 		file_reader.close();
+
+		console::print("Successfully processed file: ");
+		console::print(filepath);
+		console::print("\n");
 	}
 	else
-		std::cout << "Failed to open file " << filepath << std::endl;
+	{
+		console::print("Failed to open file: ");
+		console::print(filepath);
+		console::print("\n");
+	}
 
 	return textures;
 }

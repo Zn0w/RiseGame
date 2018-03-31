@@ -8,6 +8,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../console/console.h"
+
 struct Entity_data
 {
 	std::string type;
