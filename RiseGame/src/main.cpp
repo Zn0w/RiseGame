@@ -29,7 +29,7 @@ void destroy(sf::RenderWindow*);
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Rise Game", sf::Style::Fullscreen);
+	sf::RenderWindow window(sf::VideoMode(1920, 1080), "Rise Game", sf::Style::Fullscreen);
 	window.setVerticalSyncEnabled(true);
 	sf::Clock clock;
 
@@ -170,8 +170,6 @@ int main()
 	std::vector<Entity> entities;
 
 
-	//sf::Sprite sprite_buffer;
-
 	std::map<std::string, sf::Texture> textures = load_textures("resources/levels/level_1/textures.txt");
 	std::vector<Entity_data> entity_data = load_entities_data("resources/levels/level_1/entities.txt");
 
@@ -229,12 +227,16 @@ int main()
 			entity_sprite.setTexture(error_texture);
 			entity_sprite.setColor(sf::Color::Green);
 		}
+		else if (data.type == "Ground_grass")
+		{
+			textures.at(data.texture_path).setRepeated(true);
+			entity_sprite.setTexture(textures.at(data.texture_path));
+		}
 		else
 			entity_sprite.setTexture(textures.at(data.texture_path));
 
 		if (data.type == "Ground_grass")
 		{
-			std::cout << data.w / 2 << std::endl;
 			entities.emplace_back(Entity(Dimensions(data.x, data.y, data.w, data.h), Ground_grass, entity_sprite, NULL));
 		}
 		else if (data.type == "Player")
