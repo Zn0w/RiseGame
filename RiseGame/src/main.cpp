@@ -227,11 +227,6 @@ int main()
 			entity_sprite.setTexture(error_texture);
 			entity_sprite.setColor(sf::Color::Green);
 		}
-		else if (data.type == "Ground_grass")
-		{
-			textures.at(data.texture_path).setRepeated(true);
-			entity_sprite.setTexture(textures.at(data.texture_path));
-		}
 		else
 			entity_sprite.setTexture(textures.at(data.texture_path));
 
