@@ -207,7 +207,7 @@ int main()
 	// Vector usage optimization
 	entities.reserve(entity_data.size());
 
-	for (Entity_data data : entity_data)
+	/*for (Entity_data data : entity_data)
 	{
 		std::cout << data.type << std::endl;
 		std::cout << data.texture_path << std::endl;
@@ -255,6 +255,68 @@ int main()
 			+ " w" + std::to_string(data.w)
 			+ " h" + std::to_string(data.h) + "\n"
 		);
+	}*/
+
+	// Testing tileset level
+	char level[18][33] = {
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGSSSSSSSGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+		"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+
+	};
+	
+	sf::Sprite entity_sprite;
+	
+	for (int y = 0; y < 18; y++)
+	{
+		for (int x = 0; x < 32; x++)
+		{
+			sf::Sprite entity_sprite;
+			
+			if (level[y][x] == 'G')
+			{
+				entity_sprite.setTexture(textures.at("grass.png"));
+				
+				entities.emplace_back(
+					Entity(
+						Dimensions(x * (window_size.x / 32), y * (window_size.y / 18), window_size.x / 32, window_size.y / 18),
+						Ground_grass,
+						entity_sprite,
+						NULL)
+				);
+
+				std::cout << "Entity G: " << x * (window_size.x / 32) << y * (window_size.y / 18) << window_size.x / 32 << window_size.y / 18 << std::endl;
+			}
+			else if (level[y][x] == 'P')
+			{
+				entity_sprite.setTexture(textures.at("pine.jpg"));
+
+				entities.emplace_back(
+					Entity(
+						Dimensions(x * (window_size.x / 32), y * (window_size.y / 18), window_size.x / 32, window_size.y / 18),
+						Ground_pine,
+						entity_sprite,
+						NULL)
+				);
+
+				std::cout << "Entity G: " << x * (window_size.x / 32) << y * (window_size.y / 18) << window_size.x / 32 << window_size.y / 18 << std::endl;
+			}
+		}
 	}
 
 

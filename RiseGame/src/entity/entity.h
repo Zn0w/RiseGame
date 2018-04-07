@@ -22,6 +22,7 @@ enum EntityType
 	Player,
 	
 	Ground_grass,
+	Ground_pine,
 
 	Test_object,
 
