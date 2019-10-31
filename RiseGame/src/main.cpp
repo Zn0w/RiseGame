@@ -23,6 +23,7 @@ LRESULT CALLBACK MainWindowCallback(
 
 		case WM_CLOSE:
 		{
+			PostQuitMessage(0);
 			OutputDebugStringA("WM_CLOSE\n");
 		} break;
 
@@ -33,15 +34,21 @@ LRESULT CALLBACK MainWindowCallback(
 
 		case WM_PAINT:
 		{
+			static DWORD color = WHITENESS;
+			if (color == WHITENESS)
+				color = BLACKNESS;
+			else
+				color = WHITENESS;
+			
 			PAINTSTRUCT paint;
 			HDC device_context = BeginPaint(window_handle, &paint);
-			PatBlt(device_context, paint.rcPaint.left, paint.rcPaint.top, paint.rcPaint.right, paint.rcPaint.bottom, BLACKNESS);
+			PatBlt(device_context, paint.rcPaint.left, paint.rcPaint.top, paint.rcPaint.right, paint.rcPaint.bottom, color);
 			EndPaint(window_handle, &paint);
 		} break;
 
 		default:
 		{
-			OutputDebugStringA("default\n");
+			//OutputDebugStringA("default\n");
 			result = DefWindowProc(window_handle, message, wParam, lParam);
 		} break;
 	}
@@ -60,15 +67,15 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	if (!RegisterClass(&window_class))
 	{
-		OutputDebugStringA("Class not registered\n");
-		return -1;
+		OutputDebugStringA("Failed to create window (class did not register)\n");
+		return -1;	
 	}
 
 	HWND window_handle = CreateWindowExA(
 		0,
 		window_class.lpszClassName,
 		"Rise Game",
-		WS_OVERLAPPED | WS_VISIBLE,
+		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
