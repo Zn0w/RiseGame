@@ -10,7 +10,7 @@ static BITMAPINFO bitmap_info;
 static void* bitmap_memory;
 
 
-static void draw_pink_canvas()
+static void render_background(int red, int green, int blue)
 {
 	int bytes_per_pixel = 4;
 	int pitch = bitmap_width * bytes_per_pixel;
@@ -23,13 +23,13 @@ static void draw_pink_canvas()
 			// NOTE : little endian architecture
 			//		  pixel in memory : BB GG RR xx
 			//					  blue  green  red  pad byte
-			*pixel = 200;
+			*pixel = blue;
 			++pixel;
 
-			*pixel = 200;
+			*pixel = green;
 			++pixel;
 
-			*pixel = 250;
+			*pixel = red;
 			++pixel;
 
 			*pixel = 0;
@@ -61,7 +61,7 @@ static void resizeFrameBuffer(int width, int height)
 	int bitmap_memory_size = bitmap_width * bitmap_height * bytes_per_pixel;
 	bitmap_memory = VirtualAlloc(0, bitmap_memory_size, MEM_COMMIT, PAGE_READWRITE);
 
-	draw_pink_canvas();
+	render_background(250, 180, 200);
 }
 
 static void updateWindow(HDC device_context, RECT* window_rect)
