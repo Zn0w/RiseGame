@@ -1,50 +1,77 @@
 #include <windows.h>
+#include <stdint.h>
 
 #include "game.h"
 
 
 static bool running;
+static int bitmap_width, bitmap_height;
 static BITMAPINFO bitmap_info;
 static void* bitmap_memory;
-static HBITMAP bitmap_handle;
-static HDC bitmap_device_context;
 
+
+static void draw_pink_canvas()
+{
+	int bytes_per_pixel = 4;
+	int pitch = bitmap_width * bytes_per_pixel;
+	uint8_t* row = (uint8_t*)bitmap_memory;
+	for (int y = 0; y < bitmap_height; y++)
+	{
+		uint8_t* pixel = (uint8_t*)row;
+		for (int x = 0; x < bitmap_width; x++)
+		{
+			// NOTE : little endian architecture
+			//		  pixel in memory : BB GG RR xx
+			//					  blue  green  red  pad byte
+			*pixel = 200;
+			++pixel;
+
+			*pixel = 200;
+			++pixel;
+
+			*pixel = 250;
+			++pixel;
+
+			*pixel = 0;
+			++pixel;
+		}
+		row += pitch;
+	}
+}
 
 // resizes the Device Independent Buffer (DIB) section
 static void resizeFrameBuffer(int width, int height)
 {
-	if (bitmap_handle)
+	if (bitmap_memory)
 	{
-		DeleteObject(bitmap_handle);
+		VirtualFree(bitmap_memory, 0, MEM_RELEASE);
 	}
-	else
-	{
-		bitmap_device_context = CreateCompatibleDC(0);
-	}
+
+	bitmap_width = width;
+	bitmap_height = height;
 	
 	bitmap_info.bmiHeader.biSize = sizeof(bitmap_info.bmiHeader);
-	bitmap_info.bmiHeader.biWidth = width;
-	bitmap_info.bmiHeader.biHeight = height;
+	bitmap_info.bmiHeader.biWidth = bitmap_width;
+	bitmap_info.bmiHeader.biHeight = -bitmap_height;
 	bitmap_info.bmiHeader.biPlanes = 1;
 	bitmap_info.bmiHeader.biBitCount = 32;
 	bitmap_info.bmiHeader.biCompression = BI_RGB;
 
-	bitmap_handle = CreateDIBSection(
-		bitmap_device_context,
-		&bitmap_info,
-		DIB_RGB_COLORS,
-		&bitmap_memory,
-		NULL,
-		NULL
-	);
+	int bytes_per_pixel = 4;
+	int bitmap_memory_size = bitmap_width * bitmap_height * bytes_per_pixel;
+	bitmap_memory = VirtualAlloc(0, bitmap_memory_size, MEM_COMMIT, PAGE_READWRITE);
+
+	draw_pink_canvas();
 }
 
-static void updateWindow(HDC device_context, int x, int y, int width, int height)
+static void updateWindow(HDC device_context, RECT* window_rect)
 {
+	int window_width = window_rect->right - window_rect->left;
+	int window_height = window_rect->bottom - window_rect->top;
 	StretchDIBits(
 		device_context,
-		x, y, width, height,
-		x, y, width, height,
+		0, 0, bitmap_width, bitmap_height,
+		0, 0, bitmap_width, bitmap_height,
 		bitmap_memory,
 		&bitmap_info,
 		DIB_RGB_COLORS,
@@ -102,7 +129,9 @@ LRESULT CALLBACK PrimaryWindowCallback(
 			int width = paint.rcPaint.right - paint.rcPaint.left;
 			int height = paint.rcPaint.bottom - paint.rcPaint.top;
 
-			updateWindow(device_context, x, y, width, height);
+			RECT client_rect;
+			GetClientRect(window_handle, &client_rect);
+			updateWindow(device_context, &client_rect);
 			
 			EndPaint(window_handle, &paint);
 		} break;
@@ -139,6 +168,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		return -1;	
 	}
 
+	// TODO : deal with the fact that x, y, width and height arguments of the CreateWindowEx is
+	//		  taking the section with title and min/max/close buttons into account
 	HWND window_handle = CreateWindowExA(
 		0,
 		window_class.lpszClassName,
