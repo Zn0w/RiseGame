@@ -4,21 +4,41 @@
 #include "game.h"
 
 
-static bool running;
-static int bitmap_width, bitmap_height;
-static BITMAPINFO bitmap_info;
-static void* bitmap_memory;
-
-
-static void render_background(int red, int green, int blue)
+struct BitmapBuffer
 {
+	int width, height;
+	BITMAPINFO info;
+	void* memory;
+	int pitch;
 	int bytes_per_pixel = 4;
-	int pitch = bitmap_width * bytes_per_pixel;
-	uint8_t* row = (uint8_t*)bitmap_memory;
-	for (int y = 0; y < bitmap_height; y++)
+};
+
+struct WindowDimensions
+{
+	int width, height;
+};
+
+
+static bool running;
+static BitmapBuffer backbuffer;
+
+
+WindowDimensions getWindowDimensions(HWND window_handle)
+{
+	RECT client_rect;
+	GetClientRect(window_handle, &client_rect);
+
+	return { client_rect.right - client_rect.left, client_rect.bottom - client_rect.top };
+}
+
+static void render_background(BitmapBuffer* buffer, int red, int green, int blue)
+{
+	int pitch = buffer->width * buffer->bytes_per_pixel;
+	uint8_t* row = (uint8_t*)buffer->memory;
+	for (int y = 0; y < buffer->height; y++)
 	{
 		uint8_t* pixel = (uint8_t*)row;
-		for (int x = 0; x < bitmap_width; x++)
+		for (int x = 0; x < buffer->width; x++)
 		{
 			// NOTE : little endian architecture
 			//		  pixel in memory : BB GG RR xx
@@ -40,40 +60,39 @@ static void render_background(int red, int green, int blue)
 }
 
 // resizes the Device Independent Buffer (DIB) section
-static void resizeFrameBuffer(int width, int height)
+static void resizeFrameBuffer(BitmapBuffer* buffer, int width, int height)
 {
-	if (bitmap_memory)
+	if (buffer->memory)
 	{
-		VirtualFree(bitmap_memory, 0, MEM_RELEASE);
+		VirtualFree(buffer->memory, 0, MEM_RELEASE);
 	}
 
-	bitmap_width = width;
-	bitmap_height = height;
+	buffer->width = width;
+	buffer->height = height;
 	
-	bitmap_info.bmiHeader.biSize = sizeof(bitmap_info.bmiHeader);
-	bitmap_info.bmiHeader.biWidth = bitmap_width;
-	bitmap_info.bmiHeader.biHeight = -bitmap_height;
-	bitmap_info.bmiHeader.biPlanes = 1;
-	bitmap_info.bmiHeader.biBitCount = 32;
-	bitmap_info.bmiHeader.biCompression = BI_RGB;
+	buffer->info.bmiHeader.biSize = sizeof(buffer->info.bmiHeader);
+	buffer->info.bmiHeader.biWidth = buffer->width;
+	buffer->info.bmiHeader.biHeight = -(buffer->height);
+	buffer->info.bmiHeader.biPlanes = 1;
+	buffer->info.bmiHeader.biBitCount = 32;
+	buffer->info.bmiHeader.biCompression = BI_RGB;
 
-	int bytes_per_pixel = 4;
-	int bitmap_memory_size = bitmap_width * bitmap_height * bytes_per_pixel;
-	bitmap_memory = VirtualAlloc(0, bitmap_memory_size, MEM_COMMIT, PAGE_READWRITE);
+	int bitmap_memory_size = buffer->width * buffer->height * buffer->bytes_per_pixel;
+	buffer->memory = VirtualAlloc(0, bitmap_memory_size, MEM_COMMIT, PAGE_READWRITE);
 
-	render_background(250, 180, 200);
+	buffer->pitch = buffer->width * buffer->bytes_per_pixel;
+
+	render_background(buffer, 250, 230, 150);
 }
 
-static void updateWindow(HDC device_context, RECT* window_rect)
+static void copyBufferToWindow(BitmapBuffer* buffer, HDC device_context, int window_width, int window_height)
 {
-	int window_width = window_rect->right - window_rect->left;
-	int window_height = window_rect->bottom - window_rect->top;
 	StretchDIBits(
 		device_context,
-		0, 0, bitmap_width, bitmap_height,
-		0, 0, bitmap_width, bitmap_height,
-		bitmap_memory,
-		&bitmap_info,
+		0, 0, buffer->width, buffer->height,
+		0, 0, window_width, window_height,
+		buffer->memory,
+		&(buffer->info),
 		DIB_RGB_COLORS,
 		SRCCOPY
 	);
@@ -92,12 +111,8 @@ LRESULT CALLBACK PrimaryWindowCallback(
 	{
 		case WM_SIZE:
 		{
-			RECT client_rect;
-			GetClientRect(window_handle, &client_rect);
-			resizeFrameBuffer(
-				client_rect.right - client_rect.left,
-				client_rect.bottom - client_rect.top
-			);
+			WindowDimensions window_dimensions = getWindowDimensions(window_handle);
+			resizeFrameBuffer(&backbuffer, window_dimensions.width, window_dimensions.height);
 
 			OutputDebugStringA("Window resize\n");
 		} break;
@@ -119,19 +134,18 @@ LRESULT CALLBACK PrimaryWindowCallback(
 			OutputDebugStringA("Window toggle focus\n");
 		} break;
 
+		/*case WM_SETCURSOR:
+		{
+			SetCursor(0);
+		} break;*/
+
 		case WM_PAINT:
 		{	
 			PAINTSTRUCT paint;
 			HDC device_context = BeginPaint(window_handle, &paint);
 
-			int x = paint.rcPaint.left;
-			int	y = paint.rcPaint.top;
-			int width = paint.rcPaint.right - paint.rcPaint.left;
-			int height = paint.rcPaint.bottom - paint.rcPaint.top;
-
-			RECT client_rect;
-			GetClientRect(window_handle, &client_rect);
-			updateWindow(device_context, &client_rect);
+			WindowDimensions window_dimensions = getWindowDimensions(window_handle);
+			copyBufferToWindow(&backbuffer, device_context, window_dimensions.width, window_dimensions.height);
 			
 			EndPaint(window_handle, &paint);
 		} break;
@@ -154,9 +168,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	// for now, it's hardcoded
 	screen_x = 250;
 	screen_y = 250;
+	//MonitorFromWindow();
 	
 	WNDCLASSA window_class = {};	// init every member to 0
-	window_class.style = CS_CLASSDC | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+	window_class.style = CS_HREDRAW | CS_VREDRAW;
 	window_class.lpfnWndProc = PrimaryWindowCallback;
 	window_class.hInstance = hInstance;
 	//window_class.hIcon;
@@ -192,16 +207,19 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		while (running)
 		{
 			MSG message;
-			if (GetMessage(&message, 0, 0, 0))
+			while (PeekMessage(&message, 0, 0, 0, PM_REMOVE))
 			{
+				if (message.message == WM_QUIT)
+					running = false;
+				
 				TranslateMessage(&message);
 				DispatchMessage(&message);		// Send message to the WindowProc
 			}
-			else
-			{
-				break;
-			}
 		}
+	}
+	else
+	{
+		OutputDebugStringA("Window handle in null\n");
 	}
 	
 	return 0;
