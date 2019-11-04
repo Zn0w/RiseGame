@@ -89,8 +89,8 @@ static void copyBufferToWindow(BitmapBuffer* buffer, HDC device_context, int win
 {
 	StretchDIBits(
 		device_context,
-		0, 0, buffer->width, buffer->height,
 		0, 0, window_width, window_height,
+		0, 0, buffer->width, buffer->height,
 		buffer->memory,
 		&(buffer->info),
 		DIB_RGB_COLORS,
@@ -111,9 +111,6 @@ LRESULT CALLBACK PrimaryWindowCallback(
 	{
 		case WM_SIZE:
 		{
-			WindowDimensions window_dimensions = getWindowDimensions(window_handle);
-			resizeFrameBuffer(&backbuffer, window_dimensions.width, window_dimensions.height);
-
 			OutputDebugStringA("Window resize\n");
 		} break;
 
@@ -161,16 +158,23 @@ LRESULT CALLBACK PrimaryWindowCallback(
 
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) // NOTE: MSDN
 {
-	int screen_x, screen_y, screen_width, screen_height;
-	init_game(&screen_width, &screen_height);
+	
+	WNDCLASSA window_class = {};	// init every member to 0
+
+	int screen_x;
+	int screen_y;
+	int screen_width;
+	int screen_height;
+
+	get_user_resolution(&screen_width, &screen_height);
 
 	// TODO: calculate x and y for a window to be in center
 	// for now, it's hardcoded
-	screen_x = 250;
-	screen_y = 250;
-	//MonitorFromWindow();
+	screen_x = 500;
+	screen_y = 500;
 	
-	WNDCLASSA window_class = {};	// init every member to 0
+	resizeFrameBuffer(&backbuffer, screen_width, screen_height);
+
 	window_class.style = CS_HREDRAW | CS_VREDRAW;
 	window_class.lpfnWndProc = PrimaryWindowCallback;
 	window_class.hInstance = hInstance;
@@ -190,10 +194,10 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		window_class.lpszClassName,
 		"Rise Game",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		screen_x,
-		screen_y,
-		screen_width,
-		screen_height,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
 		0,
 		0,
 		hInstance,
