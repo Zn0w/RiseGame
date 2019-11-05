@@ -147,6 +147,70 @@ LRESULT CALLBACK PrimaryWindowCallback(
 			OutputDebugStringA("Window toggle focus\n");
 		} break;
 
+		// keyboard input handling
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+		{
+			uint32_t VKCode = wParam;
+
+			bool was_down	= (lParam & (1 << 30)) != 0;
+			bool is_down	= (lParam & (1 << 31)) == 0;
+			if (was_down != is_down)
+			{
+				if (VKCode == 'W')
+				{
+					if (was_down && !is_down)
+						OutputDebugStringA("W is released!\n");
+				}
+				else if (VKCode == 'A')
+				{
+
+				}
+				else if (VKCode == 'S')
+				{
+
+				}
+				else if (VKCode == 'D')
+				{
+
+				}
+				else if (VKCode == 'Q')
+				{
+
+				}
+				else if (VKCode == 'E')
+				{
+
+				}
+				else if (VKCode == VK_UP)
+				{
+
+				}
+				else if (VKCode == VK_DOWN)
+				{
+
+				}
+				else if (VKCode == VK_LEFT)
+				{
+
+				}
+				else if (VKCode == VK_RIGHT)
+				{
+
+				}
+				else if (VKCode == VK_SPACE)
+				{
+
+				}
+				else if (VKCode == VK_ESCAPE)
+				{
+
+				}
+			}
+		} break;
+
 		/*case WM_SETCURSOR:
 		{
 			SetCursor(0);
@@ -276,6 +340,9 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 					
 				}
 			}
+
+			// get keyboard input
+
 		}
 	}
 	else
