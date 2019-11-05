@@ -227,6 +227,14 @@ LRESULT CALLBACK PrimaryWindowCallback(
 				{
 
 				}
+
+				// handle the close operation with alt+F4
+				bool alt_key_was_down = (lParam & (1 << 29)) != 0;
+				if ((VKCode == VK_F4) && alt_key_was_down)
+				{
+					running = false;
+					// TODO : handle the game destroy
+				}
 			}
 		} break;
 
@@ -317,6 +325,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			{
 				if (message.message == WM_QUIT)
 					running = false;
+					// TODO : handle the game destroy (call a function)
 				
 				TranslateMessage(&message);
 				DispatchMessage(&message);		// Send message to the WindowProc
