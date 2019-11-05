@@ -28,14 +28,33 @@ static BitmapBuffer backbuffer;
 // solving the unresolved externals linking problem when using XInputGetState and XInputSetState (loading the dll)
 typedef DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState);
 typedef DWORD WINAPI xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
-static xinput_get_state* XInputGetState_;
-static xinput_set_state* XInputSetState_;
+
+// NOTE : stub functions (functions with no implementation), they will be used if xinput library failed to load
+// because we want to be able to play the game even if we don't have a library to support gamepad input (use keyboard instead)
+DWORD WINAPI xinput_get_state_stub(DWORD dwUserIndex, XINPUT_STATE* pState)
+{
+	return ERROR_DEVICE_NOT_CONNECTED;
+}
+DWORD WINAPI xinput_set_state_stub(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
+{
+	return ERROR_DEVICE_NOT_CONNECTED;
+}
+
+static xinput_get_state* XInputGetState_ = xinput_get_state_stub;
+static xinput_set_state* XInputSetState_ = xinput_set_state_stub;
 #define XInputGetState XInputGetState_
 #define XInputSetState XInputSetState_
 
 static void LoadXInput()
 {
-	HMODULE XInputLibrary = LoadLibrary("xinput1_3.dll");
+	HMODULE XInputLibrary = LoadLibrary("xinput1_4.dll");
+	// if version 1.4 of xinput is not supported by the os, load version 1.3
+	// NOTE : made primarily to support windows 8, since windows 8 has only one version of xinput which is 1.4
+	if (!XInputLibrary)
+	{
+		HMODULE XInputLibrary = LoadLibrary("xinput1_3.dll");
+	}
+
 	if (XInputLibrary)
 	{
 		XInputGetState = (xinput_get_state*) GetProcAddress(XInputLibrary, "XInputGetState");
