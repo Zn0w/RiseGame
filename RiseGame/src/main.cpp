@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdint.h>
+#include <xinput.h>
 
 #include "game.h"
 
@@ -9,7 +10,7 @@ struct BitmapBuffer
 	int width, height;
 	BITMAPINFO info;
 	void* memory;
-	int pitch;
+	int pitch;	// in bytes
 	int bytes_per_pixel = 4;
 };
 
@@ -22,6 +23,26 @@ struct WindowDimensions
 static bool running;
 static BitmapBuffer backbuffer;
 
+
+//-----------------------------------------------------------------------------------------------------------------
+// solving the unresolved externals linking problem when using XInputGetState and XInputSetState (loading the dll)
+typedef DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState);
+typedef DWORD WINAPI xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
+static xinput_get_state* XInputGetState_;
+static xinput_set_state* XInputSetState_;
+#define XInputGetState XInputGetState_
+#define XInputSetState XInputSetState_
+
+static void LoadXInput()
+{
+	HMODULE XInputLibrary = LoadLibrary("xinput1_3.dll");
+	if (XInputLibrary)
+	{
+		XInputGetState = (xinput_get_state*) GetProcAddress(XInputLibrary, "XInputGetState");
+		XInputSetState = (xinput_set_state*) GetProcAddress(XInputLibrary, "XInputSetState");
+	}
+}
+//-----------------------------------------------------------------------------------------------------------------
 
 WindowDimensions getWindowDimensions(HWND window_handle)
 {
@@ -109,11 +130,6 @@ LRESULT CALLBACK PrimaryWindowCallback(
 	
 	switch (message)
 	{
-		case WM_SIZE:
-		{
-			OutputDebugStringA("Window resize\n");
-		} break;
-
 		case WM_CLOSE:
 		{
 			running = false;
@@ -158,6 +174,8 @@ LRESULT CALLBACK PrimaryWindowCallback(
 
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) // NOTE: MSDN
 {
+	// load the XInput dll library
+	LoadXInput();
 	
 	WNDCLASSA window_class = {};	// init every member to 0
 
@@ -210,6 +228,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		
 		while (running)
 		{
+			// process windows messages
 			MSG message;
 			while (PeekMessage(&message, 0, 0, 0, PM_REMOVE))
 			{
@@ -219,11 +238,49 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 				TranslateMessage(&message);
 				DispatchMessage(&message);		// Send message to the WindowProc
 			}
+
+			// get gamepad input
+			for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
+			{
+				XINPUT_STATE controller_state;
+				//ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+				// Get the state of the controller from XInput
+				if (XInputGetState(i, &controller_state) == ERROR_SUCCESS)	// Controller is connected
+				{ 
+					bool up				= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
+					bool down			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+					bool left			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
+					bool right			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+					bool start			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_START);
+					bool back			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK);
+					bool left_thumb		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
+					bool right_thumb	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
+					bool left_shoulder	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+					bool right_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+					bool a_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A);
+					bool b_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B);
+					bool x_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_X);
+					bool y_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
+					
+					uint8_t left_trigger	= controller_state.Gamepad.bLeftTrigger;
+					uint8_t right_trigger	= controller_state.Gamepad.bRightTrigger;
+					
+					uint16_t thumb_left_x	= controller_state.Gamepad.sThumbLX;
+					uint16_t thumb_left_y	= controller_state.Gamepad.sThumbLY;
+					uint16_t thumb_right_x	= controller_state.Gamepad.sThumbRX;
+					uint16_t thumb_right_y	= controller_state.Gamepad.sThumbRY;
+				}
+				else	// Controller is not connected 
+				{
+					
+				}
+			}
 		}
 	}
 	else
 	{
-		OutputDebugStringA("Window handle in null\n");
+		OutputDebugStringA("Window handle is null\n");
 	}
 	
 	return 0;
