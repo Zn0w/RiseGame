@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <stdint.h>
 #include <xinput.h>
+#include <dsound.h>
 
 #include "game.h"
 
@@ -60,6 +61,89 @@ static void LoadXInput()
 		XInputGetState = (xinput_get_state*) GetProcAddress(XInputLibrary, "XInputGetState");
 		XInputSetState = (xinput_set_state*) GetProcAddress(XInputLibrary, "XInputSetState");
 	}
+}
+//-----------------------------------------------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------------------------------------------
+// Load DirectSound library
+typedef HRESULT WINAPI dsound_create(LPCGUID pcGuidDevice, LPDIRECTSOUND* ppDS, LPUNKNOWN pUnkOuter);
+
+static void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32_t sound_buffer_size_in_bytes)
+{
+	// load the DirectSound library
+	HMODULE DirectSoundLibrary = LoadLibrary("dsound.dll");
+	if (DirectSoundLibrary)
+	{
+		dsound_create* DirectSoundCreate = (dsound_create*)GetProcAddress(DirectSoundLibrary, "DirectSoundCreate");
+
+		// get a DirectSound Object
+		LPDIRECTSOUND direct_sound_object;
+		if (DirectSoundCreate && SUCCEEDED(DirectSoundCreate(0, &direct_sound_object, 0)))
+		{
+			if (SUCCEEDED(direct_sound_object->SetCooperativeLevel(window_handle, DSSCL_PRIORITY)))
+			{
+				WAVEFORMATEX wave_format = {};
+				wave_format.wFormatTag = WAVE_FORMAT_PCM;
+				wave_format.nChannels = 2;
+				wave_format.nSamplesPerSec = samples_per_sec;
+				wave_format.wBitsPerSample = 16;
+				wave_format.nBlockAlign = (wave_format.nChannels * wave_format.wBitsPerSample) / 8;
+				wave_format.nAvgBytesPerSec = wave_format.nSamplesPerSec * wave_format.nBlockAlign;
+				wave_format.cbSize = 0;
+
+				// "create" a secondary buffer
+				DSBUFFERDESC buffer_description = {};	// init all the members to 0
+				buffer_description.dwSize = sizeof(buffer_description);
+				buffer_description.dwFlags = DSBCAPS_PRIMARYBUFFER;
+
+				LPDIRECTSOUNDBUFFER primary_buffer;
+				if (SUCCEEDED(direct_sound_object->CreateSoundBuffer(&buffer_description, &primary_buffer, 0)))
+				{
+					if (SUCCEEDED(primary_buffer->SetFormat(&wave_format)))
+					{
+						OutputDebugStringA("Primary buffer format was set\n");
+					}
+					else
+					{
+						OutputDebugStringA("Failed to set a primary buffer format\n");
+					}
+				}
+				else
+					OutputDebugStringA("Failed to create a primary buffer\n");
+
+				// "create" a secondary buffer
+				buffer_description = {};
+				buffer_description.dwSize = sizeof(buffer_description);
+				buffer_description.dwFlags = DSCAPS_SECONDARYSTEREO;
+				buffer_description.dwBufferBytes = sound_buffer_size_in_bytes;
+				buffer_description.lpwfxFormat = &wave_format;
+
+				LPDIRECTSOUNDBUFFER secondary_buffer;
+				if (SUCCEEDED(direct_sound_object->CreateSoundBuffer(&buffer_description, &secondary_buffer, 0)))
+				{
+					if (SUCCEEDED(secondary_buffer->SetFormat(&wave_format)))
+					{
+						OutputDebugStringA("Secondary buffer format was set\n");
+					}
+					else
+					{
+						OutputDebugStringA("Failed to set a secondary buffer format\n");
+					}
+
+					// start it playing
+				}
+				else
+					OutputDebugStringA("Failed to create a secondary buffer\n");
+			}
+			else
+				OutputDebugStringA("Failed to set cooperative level\n");
+		}
+		else
+			OutputDebugStringA("Failed to get a DirectSound object\n");
+	}
+	else
+		OutputDebugStringA("Failed to load DirectSound library\n");
 }
 //-----------------------------------------------------------------------------------------------------------------
 
@@ -315,6 +399,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	if (window_handle)
 	{
+		InitDirectSound(window_handle, 48000, 48000 * sizeof(int16_t) * 2);
+		
 		running = true;
 		
 		while (running)
