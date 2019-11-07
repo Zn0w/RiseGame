@@ -23,7 +23,7 @@ struct WindowDimensions
 
 static bool running;
 static BitmapBuffer backbuffer;
-static LPDIRECTSOUNDBUFFER secondary_buffer;
+static LPDIRECTSOUNDBUFFER direct_sound_buffer;
 
 
 //-----------------------------------------------------------------------------------------------------------------
@@ -59,9 +59,11 @@ static void LoadXInput()
 
 	if (XInputLibrary)
 	{
-		XInputGetState = (xinput_get_state*) GetProcAddress(XInputLibrary, "XInputGetState");
-		XInputSetState = (xinput_set_state*) GetProcAddress(XInputLibrary, "XInputSetState");
+		XInputGetState = (xinput_get_state*)GetProcAddress(XInputLibrary, "XInputGetState");
+		XInputSetState = (xinput_set_state*)GetProcAddress(XInputLibrary, "XInputSetState");
 	}
+	else
+		OutputDebugStringA("Failed to load an XInput library\n");
 }
 //-----------------------------------------------------------------------------------------------------------------
 
@@ -105,15 +107,15 @@ static void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32
 				{
 					if (SUCCEEDED(primary_buffer->SetFormat(&wave_format)))
 					{
-						OutputDebugStringA("Primary buffer format was set\n");
+						OutputDebugStringA("DirectSound library loading status: Primary buffer format was set\n");
 					}
 					else
 					{
-						OutputDebugStringA("Failed to set a primary buffer format\n");
+						OutputDebugStringA("DirectSound library loading status: Failed to set a primary buffer format\n");
 					}
 				}
 				else
-					OutputDebugStringA("Failed to create a primary buffer\n");
+					OutputDebugStringA("DirectSound library loading status: Failed to create a primary buffer\n");
 
 				// "create" a secondary buffer
 				// NOTE : the secodanry buffer is the actual buffer where the "sound" will be temporarily stored and played from
@@ -124,18 +126,18 @@ static void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32
 				buffer_description.dwBufferBytes = sound_buffer_size_in_bytes;
 				buffer_description.lpwfxFormat = &wave_format;
 
-				if (SUCCEEDED(direct_sound_object->CreateSoundBuffer(&buffer_description, &secondary_buffer, 0)))
+				if (SUCCEEDED(direct_sound_object->CreateSoundBuffer(&buffer_description, &direct_sound_buffer, 0)))
 				{
-					OutputDebugStringA("Secondary buffer was created successfully\n");
+					OutputDebugStringA("DirectSound library loading status: Secondary buffer was created successfully\n");
 				}
 				else
-					OutputDebugStringA("Failed to create a secondary buffer\n");
+					OutputDebugStringA("DirectSound library loading status: Failed to create a secondary buffer\n");
 			}
 			else
-				OutputDebugStringA("Failed to set cooperative level\n");
+				OutputDebugStringA("DirectSound library loading status: Failed to set cooperative level\n");
 		}
 		else
-			OutputDebugStringA("Failed to get a DirectSound object\n");
+			OutputDebugStringA("DirectSound library loading status: Failed to get a DirectSound object\n");
 	}
 	else
 		OutputDebugStringA("Failed to load DirectSound library\n");
@@ -458,7 +460,9 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 			// DirectSound output test (square wave)
 
-			if (SUCCEEDED(ds_sound_object->GetCurrentPosition()))
+			DWORD play_cursor_position;
+			DWORD write_cursor_position;
+			if (SUCCEEDED(direct_sound_buffer->GetCurrentPosition(&play_cursor_position, &write_cursor_position)))
 			{
 				DWORD write_pointer;
 				DWORD bytes_to_write;
@@ -467,7 +471,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 				void* region_2;
 				DWORD region_2_size;
 				VOID* g;
-				if (SUCCEEDED(secondary_buffer->Lock(write_pointer, bytes_to_write,
+				if (SUCCEEDED(direct_sound_buffer->Lock(write_pointer, bytes_to_write,
 					&region_1, &region_1_size,
 					&region_2, &region_2_size,
 					0
