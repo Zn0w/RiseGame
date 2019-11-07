@@ -398,11 +398,16 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	{
 		int samples_per_second = 48000;
 		int bytes_per_sample = sizeof(int16_t) * 2;
-		int hz = 256;
-		int square_wave_counter = 0;
-		int square_wave_period = samples_per_second / hz;
+		int sample_hz = 256;
+		int16_t sample_volume = 16000;
+		uint32_t sample_index = 0;
+		int square_wave_period = samples_per_second / sample_hz;
+		int half_square_wave_period = square_wave_period / 2;
+		int direct_sound_buffer_size = samples_per_second * bytes_per_sample;
 
-		InitDirectSound(window_handle, samples_per_second, samples_per_second * bytes_per_sample);
+		InitDirectSound(window_handle, samples_per_second, direct_sound_buffer_size);
+
+		direct_sound_buffer->Play(0, 0, DSBPLAY_LOOPING);
 
 		running = true;
 		
@@ -464,14 +469,23 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			DWORD write_cursor_position;
 			if (SUCCEEDED(direct_sound_buffer->GetCurrentPosition(&play_cursor_position, &write_cursor_position)))
 			{
-				DWORD write_pointer;
+				DWORD byte_to_lock = sample_index * bytes_per_sample % direct_sound_buffer_size;
 				DWORD bytes_to_write;
+				if (byte_to_lock > play_cursor_position)
+				{
+					bytes_to_write = (direct_sound_buffer_size - byte_to_lock) + play_cursor_position;
+				}
+				else
+				{
+					bytes_to_write = play_cursor_position - byte_to_lock;
+				}
+
 				void* region_1;
 				DWORD region_1_size;
 				void* region_2;
 				DWORD region_2_size;
-				VOID* g;
-				if (SUCCEEDED(direct_sound_buffer->Lock(write_pointer, bytes_to_write,
+				
+				if (SUCCEEDED(direct_sound_buffer->Lock(byte_to_lock, bytes_to_write,
 					&region_1, &region_1_size,
 					&region_2, &region_2_size,
 					0
@@ -481,32 +495,31 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 					int16_t* sample_out = (int16_t*)region_1;
 					DWORD region_1_sample_count = region_1_size / bytes_per_sample;
+
+					for (DWORD i = 0; i < region_1_sample_count; ++i)
+					{
+						int16_t sample_value = ((sample_index / half_square_wave_period) % 2) ? sample_volume : -sample_volume;
+						
+						*sample_out++ = sample_value;
+						*sample_out++ = sample_value;
+						
+						sample_index++;
+					}
+
+					sample_out = (int16_t*)region_2;
 					DWORD region_2_sample_count = region_2_size / bytes_per_sample;
 
-					for (DWORD i = 0; i < region_1_size; ++i)
+					for (DWORD i = 0; i < region_2_sample_count; ++i)
 					{
-						if (square_wave_counter == 0)
-						{
-							square_wave_counter = square_wave_period;
-						}
-
-						int16_t sample_value = (square_wave_counter > (square_wave_period / 2)) ? 16000 : -16000;
+						int16_t sample_value = ((sample_index / half_square_wave_period) % 2) ? sample_volume : -sample_volume;
 
 						*sample_out++ = sample_value;
 						*sample_out++ = sample_value;
 
-						square_wave_counter--;
+						sample_index++;
 					}
 
-					for (DWORD i = 0; i < region_2_size; ++i)
-					{
-						int16_t sample_value = (square_wave_counter > (square_wave_period / 2)) ? 16000 : -16000;
-
-						*sample_out++ = sample_value;
-						*sample_out++ = sample_value;
-
-						square_wave_counter--;
-					}
+					direct_sound_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
 				}
 			}
 		}
