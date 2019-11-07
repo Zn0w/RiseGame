@@ -23,6 +23,7 @@ struct WindowDimensions
 
 static bool running;
 static BitmapBuffer backbuffer;
+static LPDIRECTSOUNDBUFFER secondary_buffer;
 
 
 //-----------------------------------------------------------------------------------------------------------------
@@ -85,14 +86,16 @@ static void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32
 			{
 				WAVEFORMATEX wave_format = {};
 				wave_format.wFormatTag = WAVE_FORMAT_PCM;
-				wave_format.nChannels = 2;
+				wave_format.nChannels = 2;	// stereo
 				wave_format.nSamplesPerSec = samples_per_sec;
 				wave_format.wBitsPerSample = 16;
 				wave_format.nBlockAlign = (wave_format.nChannels * wave_format.wBitsPerSample) / 8;
 				wave_format.nAvgBytesPerSec = wave_format.nSamplesPerSec * wave_format.nBlockAlign;
 				wave_format.cbSize = 0;
 
-				// "create" a secondary buffer
+				// "create" a primary buffer
+				// NOTE : the primary buffer is not used as a buffer, but rather as a way to set a wave format
+				//		  it will not be used further
 				DSBUFFERDESC buffer_description = {};	// init all the members to 0
 				buffer_description.dwSize = sizeof(buffer_description);
 				buffer_description.dwFlags = DSBCAPS_PRIMARYBUFFER;
@@ -113,25 +116,17 @@ static void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32
 					OutputDebugStringA("Failed to create a primary buffer\n");
 
 				// "create" a secondary buffer
+				// NOTE : the secodanry buffer is the actual buffer where the "sound" will be temporarily stored and played from
+				//		  (in this case ~2 seconds of audio)
 				buffer_description = {};
 				buffer_description.dwSize = sizeof(buffer_description);
-				buffer_description.dwFlags = DSCAPS_SECONDARYSTEREO;
+				buffer_description.dwFlags = 0;
 				buffer_description.dwBufferBytes = sound_buffer_size_in_bytes;
 				buffer_description.lpwfxFormat = &wave_format;
 
-				LPDIRECTSOUNDBUFFER secondary_buffer;
 				if (SUCCEEDED(direct_sound_object->CreateSoundBuffer(&buffer_description, &secondary_buffer, 0)))
 				{
-					if (SUCCEEDED(secondary_buffer->SetFormat(&wave_format)))
-					{
-						OutputDebugStringA("Secondary buffer format was set\n");
-					}
-					else
-					{
-						OutputDebugStringA("Failed to set a secondary buffer format\n");
-					}
-
-					// start it playing
+					OutputDebugStringA("Secondary buffer was created successfully\n");
 				}
 				else
 					OutputDebugStringA("Failed to create a secondary buffer\n");
@@ -202,7 +197,7 @@ static void resizeFrameBuffer(BitmapBuffer* buffer, int width, int height)
 	buffer->info.bmiHeader.biCompression = BI_RGB;
 
 	int bitmap_memory_size = buffer->width * buffer->height * buffer->bytes_per_pixel;
-	buffer->memory = VirtualAlloc(0, bitmap_memory_size, MEM_COMMIT, PAGE_READWRITE);
+	buffer->memory = VirtualAlloc(0, bitmap_memory_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 	buffer->pitch = buffer->width * buffer->bytes_per_pixel;
 
@@ -399,8 +394,14 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	if (window_handle)
 	{
-		InitDirectSound(window_handle, 48000, 48000 * sizeof(int16_t) * 2);
-		
+		int samples_per_second = 48000;
+		int bytes_per_sample = sizeof(int16_t) * 2;
+		int hz = 256;
+		int square_wave_counter = 0;
+		int square_wave_period = samples_per_second / hz;
+
+		InitDirectSound(window_handle, samples_per_second, samples_per_second * bytes_per_sample);
+
 		running = true;
 		
 		while (running)
@@ -455,8 +456,55 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 				}
 			}
 
-			// get keyboard input
+			// DirectSound output test (square wave)
 
+			if (SUCCEEDED(ds_sound_object->GetCurrentPosition()))
+			{
+				DWORD write_pointer;
+				DWORD bytes_to_write;
+				void* region_1;
+				DWORD region_1_size;
+				void* region_2;
+				DWORD region_2_size;
+				VOID* g;
+				if (SUCCEEDED(secondary_buffer->Lock(write_pointer, bytes_to_write,
+					&region_1, &region_1_size,
+					&region_2, &region_2_size,
+					0
+				)))
+				{
+					// TODO : assert that region_1_size and region_2_size are valid
+
+					int16_t* sample_out = (int16_t*)region_1;
+					DWORD region_1_sample_count = region_1_size / bytes_per_sample;
+					DWORD region_2_sample_count = region_2_size / bytes_per_sample;
+
+					for (DWORD i = 0; i < region_1_size; ++i)
+					{
+						if (square_wave_counter == 0)
+						{
+							square_wave_counter = square_wave_period;
+						}
+
+						int16_t sample_value = (square_wave_counter > (square_wave_period / 2)) ? 16000 : -16000;
+
+						*sample_out++ = sample_value;
+						*sample_out++ = sample_value;
+
+						square_wave_counter--;
+					}
+
+					for (DWORD i = 0; i < region_2_size; ++i)
+					{
+						int16_t sample_value = (square_wave_counter > (square_wave_period / 2)) ? 16000 : -16000;
+
+						*sample_out++ = sample_value;
+						*sample_out++ = sample_value;
+
+						square_wave_counter--;
+					}
+				}
+			}
 		}
 	}
 	else
