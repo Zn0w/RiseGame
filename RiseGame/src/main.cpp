@@ -351,17 +351,11 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	
 	WNDCLASSA window_class = {};	// init every member to 0
 
-	int screen_x;
-	int screen_y;
-	int screen_width;
-	int screen_height;
+	int screen_width = 1280;
+	int screen_height = 720;
 
-	get_user_resolution(&screen_width, &screen_height);
-
-	// TODO: calculate x and y for a window to be in center
-	// for now, it's hardcoded
-	screen_x = 500;
-	screen_y = 500;
+	// TODO: apply the user-defined resolution
+	// TODO: calculate x and y for a window origin to be in center
 	
 	resizeFrameBuffer(&backbuffer, screen_width, screen_height);
 
@@ -399,7 +393,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		int samples_per_second = 48000;
 		int bytes_per_sample = sizeof(int16_t) * 2;
 		int sample_hz = 256;
-		int16_t sample_volume = 16000;
+		int16_t sample_volume = 400;
 		uint32_t sample_index = 0;
 		int square_wave_period = samples_per_second / sample_hz;
 		int half_square_wave_period = square_wave_period / 2;
@@ -434,20 +428,37 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 				// Get the state of the controller from XInput
 				if (XInputGetState(i, &controller_state) == ERROR_SUCCESS)	// Controller is connected
 				{ 
-					bool up				= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
-					bool down			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
-					bool left			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
-					bool right			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
-					bool start			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_START);
-					bool back			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK);
-					bool left_thumb		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
-					bool right_thumb	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
-					bool left_shoulder	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
-					bool right_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
-					bool a_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A);
-					bool b_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B);
-					bool x_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_X);
-					bool y_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
+					struct {
+						uint8_t up : 1;	// the size of this member is 1 bit
+						uint8_t down : 1;
+						uint8_t left : 1;
+						uint8_t right : 1;
+						uint8_t start : 1;
+						uint8_t back : 1;
+						uint8_t left_thumb : 1;
+						uint8_t right_thumb : 1;
+						uint8_t left_shoulder : 1;
+						uint8_t right_shoulder : 1;
+						uint8_t a_button : 1;
+						uint8_t b_button : 1;
+						uint8_t x_button : 1;
+						uint8_t y_button : 1;
+					} buttons;
+					
+					buttons.up				= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
+					buttons.down			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+					buttons.left			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
+					buttons.right			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+					buttons.start			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_START);
+					buttons.back			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK);
+					buttons.left_thumb		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
+					buttons.right_thumb	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
+					buttons.left_shoulder	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+					buttons.right_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+					buttons.a_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A);
+					buttons.b_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B);
+					buttons.x_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_X);
+					buttons.y_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
 					
 					uint8_t left_trigger	= controller_state.Gamepad.bLeftTrigger;
 					uint8_t right_trigger	= controller_state.Gamepad.bRightTrigger;
@@ -523,6 +534,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 				}
 			}
 		}
+
+		destroy_game();
 	}
 	else
 	{

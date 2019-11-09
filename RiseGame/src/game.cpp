@@ -1,11 +1,22 @@
 #include "game.h"
 
+
 void init_game()
 {
 	// TODO : fetch the file with user settings(e.g. screen resolution, display mode (fullscreen, windowed), controls scheme)
 	// for now it's hardcoded
 
 	// init the game entities and subsystems
+}
+
+void update_game()
+{
+	
+}
+
+void destroy_game()
+{
+	
 }
 
 void get_user_resolution(int* screen_width, int* screen_height)
