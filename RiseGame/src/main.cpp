@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <xinput.h>
 #include <dsound.h>
+#include <math.h>
 
 #include "game.h"
 
@@ -22,15 +23,16 @@ struct WindowDimensions
 
 struct SoundOutput
 {
-	int samples_per_second = 48000;
-	int bytes_per_sample = sizeof(int16_t) * 2;
-	int sample_hz = 256;
-	int16_t sample_volume = 400;
-	uint32_t sample_index = 0;
-	int square_wave_period = samples_per_second / sample_hz;
-	int half_square_wave_period = square_wave_period / 2;
-	int direct_sound_buffer_size = samples_per_second * bytes_per_sample;
+	int samples_per_second;
+	int bytes_per_sample;
+	int sample_hz;
+	int16_t sample_volume;
+	uint32_t sample_index;
+	int wave_period;
+	int direct_sound_buffer_size;
 };
+
+#define SIN_PERIOD (2.0f * 3.14159265359f)
 
 
 static bool running;
@@ -176,7 +178,9 @@ void fillSoundBuffer(SoundOutput* sound_output, DWORD byte_to_lock, DWORD bytes_
 
 		for (DWORD i = 0; i < region_1_sample_count; ++i)
 		{
-			int16_t sample_value = ((sound_output->sample_index / sound_output->half_square_wave_period) % 2) ? sound_output->sample_volume : -(sound_output->sample_volume);
+			float t = SIN_PERIOD * (float)sound_output->sample_index / (float)sound_output->wave_period;
+			float sin_value = sinf(t);
+			int16_t sample_value = (int16_t)(sin_value * sound_output->sample_volume);
 
 			*sample_out++ = sample_value;
 			*sample_out++ = sample_value;
@@ -189,8 +193,10 @@ void fillSoundBuffer(SoundOutput* sound_output, DWORD byte_to_lock, DWORD bytes_
 
 		for (DWORD i = 0; i < region_2_sample_count; ++i)
 		{
-			int16_t sample_value = ((sound_output->sample_index / sound_output->half_square_wave_period) % 2) ? sound_output->sample_volume : -(sound_output->sample_volume);
-
+			float t = SIN_PERIOD * (float)sound_output->sample_index / (float)sound_output->wave_period;
+			float sin_value = sinf(t);
+			int16_t sample_value = (int16_t)(sin_value * sound_output->sample_volume);
+			
 			*sample_out++ = sample_value;
 			*sample_out++ = sample_value;
 
@@ -447,18 +453,17 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	if (window_handle)
 	{
-		SoundOutput square_wave_output;
-		square_wave_output.samples_per_second = 48000;
-		square_wave_output.bytes_per_sample = sizeof(int16_t) * 2;
-		square_wave_output.sample_hz = 256;
-		square_wave_output.sample_volume = 400;
-		square_wave_output.sample_index = 0;
-		square_wave_output.square_wave_period = square_wave_output.samples_per_second / square_wave_output.sample_hz;
-		square_wave_output.half_square_wave_period = square_wave_output.square_wave_period / 2;
-		square_wave_output.direct_sound_buffer_size = square_wave_output.samples_per_second * square_wave_output.bytes_per_sample;
+		SoundOutput sine_wave_output;
+		sine_wave_output.samples_per_second = 48000;
+		sine_wave_output.bytes_per_sample = sizeof(int16_t) * 2;
+		sine_wave_output.sample_hz = 256;
+		sine_wave_output.sample_volume = 400;
+		sine_wave_output.sample_index = 0;
+		sine_wave_output.wave_period = sine_wave_output.samples_per_second / sine_wave_output.sample_hz;
+		sine_wave_output.direct_sound_buffer_size = sine_wave_output.samples_per_second * sine_wave_output.bytes_per_sample;
 		
-		InitDirectSound(window_handle, square_wave_output.samples_per_second, square_wave_output.direct_sound_buffer_size);
-		fillSoundBuffer(&square_wave_output, 0, square_wave_output.direct_sound_buffer_size);
+		InitDirectSound(window_handle, sine_wave_output.samples_per_second, sine_wave_output.direct_sound_buffer_size);
+		fillSoundBuffer(&sine_wave_output, 0, sine_wave_output.direct_sound_buffer_size);
 		direct_sound_buffer->Play(0, 0, DSBPLAY_LOOPING);
 
 		running = true;
@@ -538,18 +543,18 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			DWORD write_cursor_position;
 			if (SUCCEEDED(direct_sound_buffer->GetCurrentPosition(&play_cursor_position, &write_cursor_position)))
 			{
-				DWORD byte_to_lock = square_wave_output.sample_index * square_wave_output.bytes_per_sample % square_wave_output.direct_sound_buffer_size;
-				DWORD bytes_to_write;
+				DWORD byte_to_lock = (sine_wave_output.sample_index * sine_wave_output.bytes_per_sample) % sine_wave_output.direct_sound_buffer_size;
+				DWORD bytes_to_write = 0;
 				if (byte_to_lock > play_cursor_position)
 				{
-					bytes_to_write = (square_wave_output.direct_sound_buffer_size - byte_to_lock) + play_cursor_position;
+					bytes_to_write = (sine_wave_output.direct_sound_buffer_size - byte_to_lock) + play_cursor_position;
 				}
 				else
 				{
 					bytes_to_write = play_cursor_position - byte_to_lock;
 				}
 
-				fillSoundBuffer(&square_wave_output, byte_to_lock, bytes_to_write);
+				fillSoundBuffer(&sine_wave_output, byte_to_lock, bytes_to_write);
 			}
 		}
 
