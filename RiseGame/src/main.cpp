@@ -302,7 +302,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			}
 
 			// get gamepad input
-			getGamepadInput();
+			GamepadInputMap gamepad_input;
+			getGamepadInput(&gamepad_input);
 
 			// DirectSound output test (sine wave)
 			loadSound(&sine_wave_output);

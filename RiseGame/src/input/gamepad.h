@@ -33,29 +33,8 @@ struct GamepadInputMap {
 };
 
 
-//-----------------------------------------------------------------------------------------------------------------
-// Load XInput library (loading the dll)
-typedef DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState);
-typedef DWORD WINAPI xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
-
-// NOTE : stub functions (functions with no implementation), they will be used if xinput library failed to load
-// because we want to be able to play the game even if we don't have a library to support gamepad input (use keyboard instead)
-DWORD WINAPI xinput_get_state_stub(DWORD dwUserIndex, XINPUT_STATE* pState)
-{
-	return ERROR_DEVICE_NOT_CONNECTED;
-}
-DWORD WINAPI xinput_set_state_stub(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
-{
-	return ERROR_DEVICE_NOT_CONNECTED;
-}
-
-static xinput_get_state* XInputGetState_ = xinput_get_state_stub;
-static xinput_set_state* XInputSetState_ = xinput_set_state_stub;
-#define XInputGetState XInputGetState_
-#define XInputSetState XInputSetState_
 
 void LoadXInput();
-//-----------------------------------------------------------------------------------------------------------------
 
 void getGamepadInput(GamepadInputMap* gamepad_input);
 
