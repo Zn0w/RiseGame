@@ -20,6 +20,18 @@ struct WindowDimensions
 	int width, height;
 };
 
+struct SoundOutput
+{
+	int samples_per_second = 48000;
+	int bytes_per_sample = sizeof(int16_t) * 2;
+	int sample_hz = 256;
+	int16_t sample_volume = 400;
+	uint32_t sample_index = 0;
+	int square_wave_period = samples_per_second / sample_hz;
+	int half_square_wave_period = square_wave_period / 2;
+	int direct_sound_buffer_size = samples_per_second * bytes_per_sample;
+};
+
 
 static bool running;
 static BitmapBuffer backbuffer;
@@ -143,6 +155,51 @@ static void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32
 		OutputDebugStringA("Failed to load DirectSound library\n");
 }
 //-----------------------------------------------------------------------------------------------------------------
+
+void fillSoundBuffer(SoundOutput* sound_output, DWORD byte_to_lock, DWORD bytes_to_write)
+{
+	void* region_1;
+	DWORD region_1_size;
+	void* region_2;
+	DWORD region_2_size;
+
+	if (SUCCEEDED(direct_sound_buffer->Lock(byte_to_lock, bytes_to_write,
+		&region_1, &region_1_size,
+		&region_2, &region_2_size,
+		0
+	)))
+	{
+		// TODO : assert that region_1_size and region_2_size are valid
+
+		int16_t* sample_out = (int16_t*)region_1;
+		DWORD region_1_sample_count = region_1_size / sound_output->bytes_per_sample;
+
+		for (DWORD i = 0; i < region_1_sample_count; ++i)
+		{
+			int16_t sample_value = ((sound_output->sample_index / sound_output->half_square_wave_period) % 2) ? sound_output->sample_volume : -(sound_output->sample_volume);
+
+			*sample_out++ = sample_value;
+			*sample_out++ = sample_value;
+
+			sound_output->sample_index++;
+		}
+
+		sample_out = (int16_t*)region_2;
+		DWORD region_2_sample_count = region_2_size / sound_output->bytes_per_sample;
+
+		for (DWORD i = 0; i < region_2_sample_count; ++i)
+		{
+			int16_t sample_value = ((sound_output->sample_index / sound_output->half_square_wave_period) % 2) ? sound_output->sample_volume : -(sound_output->sample_volume);
+
+			*sample_out++ = sample_value;
+			*sample_out++ = sample_value;
+
+			sound_output->sample_index++;
+		}
+
+		direct_sound_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
+	}
+}
 
 WindowDimensions getWindowDimensions(HWND window_handle)
 {
@@ -390,17 +447,18 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	if (window_handle)
 	{
-		int samples_per_second = 48000;
-		int bytes_per_sample = sizeof(int16_t) * 2;
-		int sample_hz = 256;
-		int16_t sample_volume = 400;
-		uint32_t sample_index = 0;
-		int square_wave_period = samples_per_second / sample_hz;
-		int half_square_wave_period = square_wave_period / 2;
-		int direct_sound_buffer_size = samples_per_second * bytes_per_sample;
-
-		InitDirectSound(window_handle, samples_per_second, direct_sound_buffer_size);
-
+		SoundOutput square_wave_output;
+		square_wave_output.samples_per_second = 48000;
+		square_wave_output.bytes_per_sample = sizeof(int16_t) * 2;
+		square_wave_output.sample_hz = 256;
+		square_wave_output.sample_volume = 400;
+		square_wave_output.sample_index = 0;
+		square_wave_output.square_wave_period = square_wave_output.samples_per_second / square_wave_output.sample_hz;
+		square_wave_output.half_square_wave_period = square_wave_output.square_wave_period / 2;
+		square_wave_output.direct_sound_buffer_size = square_wave_output.samples_per_second * square_wave_output.bytes_per_sample;
+		
+		InitDirectSound(window_handle, square_wave_output.samples_per_second, square_wave_output.direct_sound_buffer_size);
+		fillSoundBuffer(&square_wave_output, 0, square_wave_output.direct_sound_buffer_size);
 		direct_sound_buffer->Play(0, 0, DSBPLAY_LOOPING);
 
 		running = true;
@@ -480,58 +538,18 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			DWORD write_cursor_position;
 			if (SUCCEEDED(direct_sound_buffer->GetCurrentPosition(&play_cursor_position, &write_cursor_position)))
 			{
-				DWORD byte_to_lock = sample_index * bytes_per_sample % direct_sound_buffer_size;
+				DWORD byte_to_lock = square_wave_output.sample_index * square_wave_output.bytes_per_sample % square_wave_output.direct_sound_buffer_size;
 				DWORD bytes_to_write;
 				if (byte_to_lock > play_cursor_position)
 				{
-					bytes_to_write = (direct_sound_buffer_size - byte_to_lock) + play_cursor_position;
+					bytes_to_write = (square_wave_output.direct_sound_buffer_size - byte_to_lock) + play_cursor_position;
 				}
 				else
 				{
 					bytes_to_write = play_cursor_position - byte_to_lock;
 				}
 
-				void* region_1;
-				DWORD region_1_size;
-				void* region_2;
-				DWORD region_2_size;
-				
-				if (SUCCEEDED(direct_sound_buffer->Lock(byte_to_lock, bytes_to_write,
-					&region_1, &region_1_size,
-					&region_2, &region_2_size,
-					0
-				)))
-				{
-					// TODO : assert that region_1_size and region_2_size are valid
-
-					int16_t* sample_out = (int16_t*)region_1;
-					DWORD region_1_sample_count = region_1_size / bytes_per_sample;
-
-					for (DWORD i = 0; i < region_1_sample_count; ++i)
-					{
-						int16_t sample_value = ((sample_index / half_square_wave_period) % 2) ? sample_volume : -sample_volume;
-						
-						*sample_out++ = sample_value;
-						*sample_out++ = sample_value;
-						
-						sample_index++;
-					}
-
-					sample_out = (int16_t*)region_2;
-					DWORD region_2_sample_count = region_2_size / bytes_per_sample;
-
-					for (DWORD i = 0; i < region_2_sample_count; ++i)
-					{
-						int16_t sample_value = ((sample_index / half_square_wave_period) % 2) ? sample_volume : -sample_volume;
-
-						*sample_out++ = sample_value;
-						*sample_out++ = sample_value;
-
-						sample_index++;
-					}
-
-					direct_sound_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
-				}
+				fillSoundBuffer(&square_wave_output, byte_to_lock, bytes_to_write);
 			}
 		}
 
