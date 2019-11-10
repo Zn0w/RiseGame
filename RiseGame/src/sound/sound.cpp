@@ -1,5 +1,6 @@
 #include "sound.h"
 
+
 void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32_t sound_buffer_size_in_bytes)
 {
 	// load the DirectSound library

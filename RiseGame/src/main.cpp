@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <stdint.h>
-#include <xinput.h>
 
+#include "input/gamepad.h"
 #include "sound/sound.h"
 #include "game.h"
 
@@ -23,48 +23,6 @@ struct WindowDimensions
 
 static bool running;
 static BitmapBuffer backbuffer;
-
-
-//-----------------------------------------------------------------------------------------------------------------
-// solving the unresolved externals linking problem when using XInputGetState and XInputSetState (loading the dll)
-typedef DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState);
-typedef DWORD WINAPI xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
-
-// NOTE : stub functions (functions with no implementation), they will be used if xinput library failed to load
-// because we want to be able to play the game even if we don't have a library to support gamepad input (use keyboard instead)
-DWORD WINAPI xinput_get_state_stub(DWORD dwUserIndex, XINPUT_STATE* pState)
-{
-	return ERROR_DEVICE_NOT_CONNECTED;
-}
-DWORD WINAPI xinput_set_state_stub(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
-{
-	return ERROR_DEVICE_NOT_CONNECTED;
-}
-
-static xinput_get_state* XInputGetState_ = xinput_get_state_stub;
-static xinput_set_state* XInputSetState_ = xinput_set_state_stub;
-#define XInputGetState XInputGetState_
-#define XInputSetState XInputSetState_
-
-static void LoadXInput()
-{
-	HMODULE XInputLibrary = LoadLibrary("xinput1_4.dll");
-	// if version 1.4 of xinput is not supported by the os, load version 1.3
-	// NOTE : made primarily to support windows 8, since windows 8 has only one version of xinput which is 1.4
-	if (!XInputLibrary)
-	{
-		HMODULE XInputLibrary = LoadLibrary("xinput1_3.dll");
-	}
-
-	if (XInputLibrary)
-	{
-		XInputGetState = (xinput_get_state*)GetProcAddress(XInputLibrary, "XInputGetState");
-		XInputSetState = (xinput_set_state*)GetProcAddress(XInputLibrary, "XInputSetState");
-	}
-	else
-		OutputDebugStringA("Failed to load an XInput library\n");
-}
-//-----------------------------------------------------------------------------------------------------------------
 
 
 WindowDimensions getWindowDimensions(HWND window_handle)
@@ -344,59 +302,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			}
 
 			// get gamepad input
-			for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
-			{
-				XINPUT_STATE controller_state;
-				//ZeroMemory(&state, sizeof(XINPUT_STATE));
-
-				// Get the state of the controller from XInput
-				if (XInputGetState(i, &controller_state) == ERROR_SUCCESS)	// Controller is connected
-				{ 
-					struct {
-						uint8_t up : 1;	// the size of this member is 1 bit
-						uint8_t down : 1;
-						uint8_t left : 1;
-						uint8_t right : 1;
-						uint8_t start : 1;
-						uint8_t back : 1;
-						uint8_t left_thumb : 1;
-						uint8_t right_thumb : 1;
-						uint8_t left_shoulder : 1;
-						uint8_t right_shoulder : 1;
-						uint8_t a_button : 1;
-						uint8_t b_button : 1;
-						uint8_t x_button : 1;
-						uint8_t y_button : 1;
-					} buttons;
-					
-					buttons.up				= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
-					buttons.down			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
-					buttons.left			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
-					buttons.right			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
-					buttons.start			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_START);
-					buttons.back			= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK);
-					buttons.left_thumb		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
-					buttons.right_thumb	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
-					buttons.left_shoulder	= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
-					buttons.right_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
-					buttons.a_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A);
-					buttons.b_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B);
-					buttons.x_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_X);
-					buttons.y_button		= (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
-					
-					uint8_t left_trigger	= controller_state.Gamepad.bLeftTrigger;
-					uint8_t right_trigger	= controller_state.Gamepad.bRightTrigger;
-					
-					uint16_t thumb_left_x	= controller_state.Gamepad.sThumbLX;
-					uint16_t thumb_left_y	= controller_state.Gamepad.sThumbLY;
-					uint16_t thumb_right_x	= controller_state.Gamepad.sThumbRX;
-					uint16_t thumb_right_y	= controller_state.Gamepad.sThumbRY;
-				}
-				else	// Controller is not connected 
-				{
-					
-				}
-			}
+			getGamepadInput();
 
 			// DirectSound output test (sine wave)
 			loadSound(&sine_wave_output);
