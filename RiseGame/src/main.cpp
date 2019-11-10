@@ -1,9 +1,8 @@
 #include <windows.h>
 #include <stdint.h>
 #include <xinput.h>
-#include <dsound.h>
-#include <math.h>
 
+#include "sound/sound.h"
 #include "game.h"
 
 
@@ -21,23 +20,9 @@ struct WindowDimensions
 	int width, height;
 };
 
-struct SoundOutput
-{
-	int samples_per_second;
-	int bytes_per_sample;
-	int sample_hz;
-	int16_t sample_volume;
-	uint32_t sample_index;
-	int wave_period;
-	int direct_sound_buffer_size;
-};
-
-#define SIN_PERIOD (2.0f * 3.14159265359f)
-
 
 static bool running;
 static BitmapBuffer backbuffer;
-static LPDIRECTSOUNDBUFFER direct_sound_buffer;
 
 
 //-----------------------------------------------------------------------------------------------------------------
@@ -81,131 +66,6 @@ static void LoadXInput()
 }
 //-----------------------------------------------------------------------------------------------------------------
 
-
-//-----------------------------------------------------------------------------------------------------------------
-// Load DirectSound library
-typedef HRESULT WINAPI dsound_create(LPCGUID pcGuidDevice, LPDIRECTSOUND* ppDS, LPUNKNOWN pUnkOuter);
-
-static void InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32_t sound_buffer_size_in_bytes)
-{
-	// load the DirectSound library
-	HMODULE DirectSoundLibrary = LoadLibrary("dsound.dll");
-	if (DirectSoundLibrary)
-	{
-		dsound_create* DirectSoundCreate = (dsound_create*)GetProcAddress(DirectSoundLibrary, "DirectSoundCreate");
-
-		// get a DirectSound Object
-		LPDIRECTSOUND direct_sound_object;
-		if (DirectSoundCreate && SUCCEEDED(DirectSoundCreate(0, &direct_sound_object, 0)))
-		{
-			if (SUCCEEDED(direct_sound_object->SetCooperativeLevel(window_handle, DSSCL_PRIORITY)))
-			{
-				WAVEFORMATEX wave_format = {};
-				wave_format.wFormatTag = WAVE_FORMAT_PCM;
-				wave_format.nChannels = 2;	// stereo
-				wave_format.nSamplesPerSec = samples_per_sec;
-				wave_format.wBitsPerSample = 16;
-				wave_format.nBlockAlign = (wave_format.nChannels * wave_format.wBitsPerSample) / 8;
-				wave_format.nAvgBytesPerSec = wave_format.nSamplesPerSec * wave_format.nBlockAlign;
-				wave_format.cbSize = 0;
-
-				// "create" a primary buffer
-				// NOTE : the primary buffer is not used as a buffer, but rather as a way to set a wave format
-				//		  it will not be used further
-				DSBUFFERDESC buffer_description = {};	// init all the members to 0
-				buffer_description.dwSize = sizeof(buffer_description);
-				buffer_description.dwFlags = DSBCAPS_PRIMARYBUFFER;
-
-				LPDIRECTSOUNDBUFFER primary_buffer;
-				if (SUCCEEDED(direct_sound_object->CreateSoundBuffer(&buffer_description, &primary_buffer, 0)))
-				{
-					if (SUCCEEDED(primary_buffer->SetFormat(&wave_format)))
-					{
-						OutputDebugStringA("DirectSound library loading status: Primary buffer format was set\n");
-					}
-					else
-					{
-						OutputDebugStringA("DirectSound library loading status: Failed to set a primary buffer format\n");
-					}
-				}
-				else
-					OutputDebugStringA("DirectSound library loading status: Failed to create a primary buffer\n");
-
-				// "create" a secondary buffer
-				// NOTE : the secodanry buffer is the actual buffer where the "sound" will be temporarily stored and played from
-				//		  (in this case ~2 seconds of audio)
-				buffer_description = {};
-				buffer_description.dwSize = sizeof(buffer_description);
-				buffer_description.dwFlags = 0;
-				buffer_description.dwBufferBytes = sound_buffer_size_in_bytes;
-				buffer_description.lpwfxFormat = &wave_format;
-
-				if (SUCCEEDED(direct_sound_object->CreateSoundBuffer(&buffer_description, &direct_sound_buffer, 0)))
-				{
-					OutputDebugStringA("DirectSound library loading status: Secondary buffer was created successfully\n");
-				}
-				else
-					OutputDebugStringA("DirectSound library loading status: Failed to create a secondary buffer\n");
-			}
-			else
-				OutputDebugStringA("DirectSound library loading status: Failed to set cooperative level\n");
-		}
-		else
-			OutputDebugStringA("DirectSound library loading status: Failed to get a DirectSound object\n");
-	}
-	else
-		OutputDebugStringA("Failed to load DirectSound library\n");
-}
-//-----------------------------------------------------------------------------------------------------------------
-
-void fillSoundBuffer(SoundOutput* sound_output, DWORD byte_to_lock, DWORD bytes_to_write)
-{
-	void* region_1;
-	DWORD region_1_size;
-	void* region_2;
-	DWORD region_2_size;
-
-	if (SUCCEEDED(direct_sound_buffer->Lock(byte_to_lock, bytes_to_write,
-		&region_1, &region_1_size,
-		&region_2, &region_2_size,
-		0
-	)))
-	{
-		// TODO : assert that region_1_size and region_2_size are valid
-
-		int16_t* sample_out = (int16_t*)region_1;
-		DWORD region_1_sample_count = region_1_size / sound_output->bytes_per_sample;
-
-		for (DWORD i = 0; i < region_1_sample_count; ++i)
-		{
-			float t = SIN_PERIOD * (float)sound_output->sample_index / (float)sound_output->wave_period;
-			float sin_value = sinf(t);
-			int16_t sample_value = (int16_t)(sin_value * sound_output->sample_volume);
-
-			*sample_out++ = sample_value;
-			*sample_out++ = sample_value;
-
-			sound_output->sample_index++;
-		}
-
-		sample_out = (int16_t*)region_2;
-		DWORD region_2_sample_count = region_2_size / sound_output->bytes_per_sample;
-
-		for (DWORD i = 0; i < region_2_sample_count; ++i)
-		{
-			float t = SIN_PERIOD * (float)sound_output->sample_index / (float)sound_output->wave_period;
-			float sin_value = sinf(t);
-			int16_t sample_value = (int16_t)(sin_value * sound_output->sample_volume);
-			
-			*sample_out++ = sample_value;
-			*sample_out++ = sample_value;
-
-			sound_output->sample_index++;
-		}
-
-		direct_sound_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
-	}
-}
 
 WindowDimensions getWindowDimensions(HWND window_handle)
 {
@@ -453,6 +313,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 	if (window_handle)
 	{
+		// DirectSound output test (sine wave)
 		SoundOutput sine_wave_output;
 		sine_wave_output.samples_per_second = 48000;
 		sine_wave_output.bytes_per_sample = sizeof(int16_t) * 2;
@@ -460,11 +321,11 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		sine_wave_output.sample_volume = 400;
 		sine_wave_output.sample_index = 0;
 		sine_wave_output.wave_period = sine_wave_output.samples_per_second / sine_wave_output.sample_hz;
-		sine_wave_output.direct_sound_buffer_size = sine_wave_output.samples_per_second * sine_wave_output.bytes_per_sample;
+		sine_wave_output.sound_buffer_size = sine_wave_output.samples_per_second * sine_wave_output.bytes_per_sample;
 		
-		InitDirectSound(window_handle, sine_wave_output.samples_per_second, sine_wave_output.direct_sound_buffer_size);
-		fillSoundBuffer(&sine_wave_output, 0, sine_wave_output.direct_sound_buffer_size);
-		direct_sound_buffer->Play(0, 0, DSBPLAY_LOOPING);
+		InitDirectSound(window_handle, sine_wave_output.samples_per_second, sine_wave_output.sound_buffer_size);
+		fillSoundBuffer(&sine_wave_output, 0, sine_wave_output.sound_buffer_size);
+		startSoundPlay();
 
 		running = true;
 		
@@ -537,25 +398,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 				}
 			}
 
-			// DirectSound output test (square wave)
-
-			DWORD play_cursor_position;
-			DWORD write_cursor_position;
-			if (SUCCEEDED(direct_sound_buffer->GetCurrentPosition(&play_cursor_position, &write_cursor_position)))
-			{
-				DWORD byte_to_lock = (sine_wave_output.sample_index * sine_wave_output.bytes_per_sample) % sine_wave_output.direct_sound_buffer_size;
-				DWORD bytes_to_write = 0;
-				if (byte_to_lock > play_cursor_position)
-				{
-					bytes_to_write = (sine_wave_output.direct_sound_buffer_size - byte_to_lock) + play_cursor_position;
-				}
-				else
-				{
-					bytes_to_write = play_cursor_position - byte_to_lock;
-				}
-
-				fillSoundBuffer(&sine_wave_output, byte_to_lock, bytes_to_write);
-			}
+			// DirectSound output test (sine wave)
+			loadSound(&sine_wave_output);
 		}
 
 		destroy_game();
