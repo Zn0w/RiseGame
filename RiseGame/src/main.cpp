@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "input/gamepad.h"
 #include "sound/sound.h"
@@ -287,6 +288,14 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 		running = true;
 		
+		LARGE_INTEGER cpu_frequency;
+		QueryPerformanceFrequency(&cpu_frequency);
+		
+		LARGE_INTEGER last_counter;
+		QueryPerformanceCounter(&last_counter);
+
+		int64_t last_cycle_count = __rdtsc();
+
 		while (running)
 		{
 			// process windows messages
@@ -307,6 +316,24 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 			// DirectSound output test (sine wave)
 			loadSound(&sine_wave_output);
+
+			int64_t end_cycle_count = __rdtsc();
+			
+			LARGE_INTEGER end_counter;
+			QueryPerformanceCounter(&end_counter);
+
+			int64_t cycles_elapsed = end_cycle_count - last_cycle_count;
+			int64_t counter_elapsed = end_counter.QuadPart - last_counter.QuadPart;
+			
+			float elapsed_time = 1000.0f * (float)counter_elapsed / (float)cpu_frequency.QuadPart;	// in milliseconds
+			int32_t fps = (int32_t)(cpu_frequency.QuadPart / counter_elapsed);
+
+			char buffer[256];
+			sprintf_s(buffer, "elapsed time: %f ms		FPS: %d		elapsed cycles: %d cycles\n", elapsed_time, fps, cycles_elapsed);
+			OutputDebugStringA(buffer);
+
+			last_cycle_count = end_cycle_count;
+			last_counter = end_counter;
 		}
 
 		destroy_game();

@@ -38,4 +38,8 @@ void LoadXInput();
 
 void getGamepadInput(GamepadInputMap* gamepad_input);
 
-// TODO : find out if the user count depends on the usb hub number
+// TODO : support multiple controllers
+// e.g. overloaded functions:
+//		getGamepadInput(GamepadInputMap*gamepad_1, GamepadInputMap* gamepad_2)
+//		getGamepadInput(GamepadInputMap*gamepad_1, GamepadInputMap* gamepad_2, GamepadInputMap* gamepad_3)
+//		getGamepadInput(GamepadInputMap*gamepad_1, GamepadInputMap* gamepad_2, GamepadInputMap* gamepad_3, GamepadInputMap* gamepad_4)
