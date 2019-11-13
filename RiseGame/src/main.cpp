@@ -7,13 +7,12 @@
 #include "game.h"
 
 
-struct BitmapBuffer
+struct Win32_BitmapBuffer
 {
 	int width, height;
 	BITMAPINFO info;
 	void* memory;
 	int pitch;	// in bytes
-	int bytes_per_pixel = 4;
 };
 
 struct WindowDimensions
@@ -21,9 +20,11 @@ struct WindowDimensions
 	int width, height;
 };
 
+#define BYTES_PER_PIXEL 4
+
 
 static bool running;
-static BitmapBuffer backbuffer;
+static Win32_BitmapBuffer backbuffer;
 
 
 WindowDimensions getWindowDimensions(HWND window_handle)
@@ -34,36 +35,19 @@ WindowDimensions getWindowDimensions(HWND window_handle)
 	return { client_rect.right - client_rect.left, client_rect.bottom - client_rect.top };
 }
 
-static void render_background(BitmapBuffer* buffer, int red, int green, int blue)
+/*BitmapBuffer win32_BitmapBuffer_to_BitmapBuffer(Win32_BitmapBuffer win32_buffer)
 {
-	int pitch = buffer->width * buffer->bytes_per_pixel;
-	uint8_t* row = (uint8_t*)buffer->memory;
-	for (int y = 0; y < buffer->height; y++)
-	{
-		uint8_t* pixel = (uint8_t*)row;
-		for (int x = 0; x < buffer->width; x++)
-		{
-			// NOTE : little endian architecture
-			//		  pixel in memory : BB GG RR xx
-			//					  blue  green  red  pad byte
-			*pixel = blue;
-			++pixel;
+	BitmapBuffer buffer = {};
+	buffer.memory = win32_buffer.memory;
+	buffer.width = win32_buffer.width;
+	buffer.height = win32_buffer.height;
+	buffer.pitch = win32_buffer.pitch;
 
-			*pixel = green;
-			++pixel;
-
-			*pixel = red;
-			++pixel;
-
-			*pixel = 0;
-			++pixel;
-		}
-		row += pitch;
-	}
-}
+	return buffer;
+}*/
 
 // resizes the Device Independent Buffer (DIB) section
-static void resizeFrameBuffer(BitmapBuffer* buffer, int width, int height)
+static void win32_resizeFrameBuffer(Win32_BitmapBuffer* buffer, int width, int height)
 {
 	if (buffer->memory)
 	{
@@ -80,15 +64,13 @@ static void resizeFrameBuffer(BitmapBuffer* buffer, int width, int height)
 	buffer->info.bmiHeader.biBitCount = 32;
 	buffer->info.bmiHeader.biCompression = BI_RGB;
 
-	int bitmap_memory_size = buffer->width * buffer->height * buffer->bytes_per_pixel;
+	int bitmap_memory_size = buffer->width * buffer->height * BYTES_PER_PIXEL;
 	buffer->memory = VirtualAlloc(0, bitmap_memory_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-	buffer->pitch = buffer->width * buffer->bytes_per_pixel;
-
-	render_background(buffer, 250, 230, 150);
+	buffer->pitch = buffer->width * BYTES_PER_PIXEL;
 }
 
-static void copyBufferToWindow(BitmapBuffer* buffer, HDC device_context, int window_width, int window_height)
+static void win32_copyBufferToWindow(Win32_BitmapBuffer* buffer, HDC device_context, int window_width, int window_height)
 {
 	StretchDIBits(
 		device_context,
@@ -212,7 +194,7 @@ LRESULT CALLBACK PrimaryWindowCallback(
 			HDC device_context = BeginPaint(window_handle, &paint);
 
 			WindowDimensions window_dimensions = getWindowDimensions(window_handle);
-			copyBufferToWindow(&backbuffer, device_context, window_dimensions.width, window_dimensions.height);
+			win32_copyBufferToWindow(&backbuffer, device_context, window_dimensions.width, window_dimensions.height);
 			
 			EndPaint(window_handle, &paint);
 		} break;
@@ -239,7 +221,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 	// TODO: apply the user-defined resolution
 	// TODO: calculate x and y for a window origin to be in center
 	
-	resizeFrameBuffer(&backbuffer, screen_width, screen_height);
+	win32_resizeFrameBuffer(&backbuffer, screen_width, screen_height);
 
 	window_class.style = CS_HREDRAW | CS_VREDRAW;
 	window_class.lpfnWndProc = PrimaryWindowCallback;
@@ -313,9 +295,28 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			// get gamepad input
 			GamepadInputMap gamepad_input;
 			getGamepadInput(&gamepad_input);
+			
+			BitmapBuffer buffer = {};
+			buffer.memory = backbuffer.memory;
+			buffer.width = backbuffer.width;
+			buffer.height = backbuffer.height;
+			buffer.pitch = backbuffer.pitch;
+			game_update_and_render(1.0f, &buffer);
 
 			// DirectSound output test (sine wave)
 			loadSound(&sine_wave_output);
+
+
+			HDC device_context = GetDC(window_handle);
+			WindowDimensions dimensions = getWindowDimensions(window_handle);
+			win32_copyBufferToWindow(
+				&backbuffer,
+				device_context,
+				dimensions.width,
+				dimensions.height
+			);
+			ReleaseDC(window_handle, device_context);
+
 
 			uint64_t end_cycle_count = __rdtsc();
 			
@@ -328,15 +329,13 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			float elapsed_time = 1000.0f * (float)counter_elapsed / (float)cpu_frequency.QuadPart;	// in milliseconds
 			int32_t fps = (int32_t)(cpu_frequency.QuadPart / counter_elapsed);
 
-			char buffer[256];
-			sprintf_s(buffer, "elapsed time: %f ms		FPS: %d		elapsed cycles: %d cycles\n", elapsed_time, fps, cycles_elapsed);
-			OutputDebugStringA(buffer);
+			// TODO : pass delta to the game function and (or) display fps
 
 			last_cycle_count = end_cycle_count;
 			last_counter = end_counter;
 		}
 
-		destroy_game();
+		game_destroy();
 	}
 	else
 	{
