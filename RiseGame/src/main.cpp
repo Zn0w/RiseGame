@@ -294,7 +294,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		LARGE_INTEGER last_counter;
 		QueryPerformanceCounter(&last_counter);
 
-		int64_t last_cycle_count = __rdtsc();
+		uint64_t last_cycle_count = __rdtsc();
 
 		while (running)
 		{
@@ -317,12 +317,12 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			// DirectSound output test (sine wave)
 			loadSound(&sine_wave_output);
 
-			int64_t end_cycle_count = __rdtsc();
+			uint64_t end_cycle_count = __rdtsc();
 			
 			LARGE_INTEGER end_counter;
 			QueryPerformanceCounter(&end_counter);
 
-			int64_t cycles_elapsed = end_cycle_count - last_cycle_count;
+			uint64_t cycles_elapsed = end_cycle_count - last_cycle_count;
 			int64_t counter_elapsed = end_counter.QuadPart - last_counter.QuadPart;
 			
 			float elapsed_time = 1000.0f * (float)counter_elapsed / (float)cpu_frequency.QuadPart;	// in milliseconds

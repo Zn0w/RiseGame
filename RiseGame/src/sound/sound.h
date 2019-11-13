@@ -1,8 +1,9 @@
 #pragma once
 
 #include <stdint.h>
-#include <dsound.h>
 #include <math.h>
+// TODO : move this to a platform-dependent sound .cpp file
+#include <dsound.h>
 
 
 struct SoundOutput
@@ -20,9 +21,10 @@ struct SoundOutput
 #define SIN_PERIOD (2.0f * 3.14159265359f)
 
 
+// TODO : wrap this into a platform-independent struct (e.g. SoundBuffer) or move to the .cpp file
 static LPDIRECTSOUNDBUFFER direct_sound_buffer;
 
-
+// TODO : make this platform-independent function (e.g. initSoundLibrary())
 //-----------------------------------------------------------------------------------------------------------------
 // Load DirectSound library
 typedef HRESULT WINAPI dsound_create(LPCGUID pcGuidDevice, LPDIRECTSOUND* ppDS, LPUNKNOWN pUnkOuter);

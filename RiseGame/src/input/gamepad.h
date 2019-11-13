@@ -1,7 +1,8 @@
 #pragma once
 
-#include <windows.h>
 #include <stdint.h>
+// TODO : move this to a platform-dependent gamepad .cpp file
+#include <windows.h>
 #include <xinput.h>
 
 
@@ -33,7 +34,7 @@ struct GamepadInputMap {
 };
 
 
-
+// TODO : make this platform-independent function (e.g. loadGamepadInputLibrary())
 void LoadXInput();
 
 void getGamepadInput(GamepadInputMap* gamepad_input);

@@ -1,7 +1,7 @@
 #include "game.h"
 
 
-void init_game()
+void game_init()
 {
 	// TODO : fetch the file with user settings(e.g. screen resolution, display mode (fullscreen, windowed), controls scheme)
 	// for now it's hardcoded
@@ -9,12 +9,12 @@ void init_game()
 	// init the game entities and subsystems
 }
 
-void update_game()
+void game_update()
 {
 	
 }
 
-void destroy_game()
+void game_destroy()
 {
 	
 }

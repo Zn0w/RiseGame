@@ -1,9 +1,9 @@
 #pragma once
 
 
-void init_game();
-void update_game();
-void destroy_game();
+void game_init();
+void game_update();
+void game_destroy();
 
 // returns a user-defined resolution
 void get_user_resolution(int* screen_width, int* screen_height);
