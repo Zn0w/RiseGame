@@ -40,9 +40,10 @@ static void render_background(BitmapBuffer* buffer, int red, int green, int blue
 	}
 }
 
-void game_update_and_render(float time, BitmapBuffer* buffer)
+void game_update_and_render(float time, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer)
 {
-	render_background(buffer, 100, 150, 200);
+	outputSound(sound_buffer);
+	render_background(graphics_buffer, 100, 150, 200);
 }
 
 void game_destroy()
