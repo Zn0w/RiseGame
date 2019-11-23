@@ -1,4 +1,9 @@
-#include "gamepad.h"
+#pragma once
+
+#include <windows.h>
+#include <xinput.h>
+
+#include "../input/gamepad.h"
 
 
 //-----------------------------------------------------------------------------------------------------------------

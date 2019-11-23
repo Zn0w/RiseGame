@@ -1,9 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-// TODO : move this to a platform-dependent gamepad .cpp file
-#include <windows.h>
-#include <xinput.h>
 
 
 struct GamepadInputMap {
@@ -32,15 +29,3 @@ struct GamepadInputMap {
 	uint16_t thumb_right_x;
 	uint16_t thumb_right_y;
 };
-
-
-// TODO : make this platform-independent function (e.g. loadGamepadInputLibrary())
-void LoadXInput();
-
-void getGamepadInput(GamepadInputMap* gamepad_input);
-
-// TODO : support multiple controllers
-// e.g. overloaded functions:
-//		getGamepadInput(GamepadInputMap*gamepad_1, GamepadInputMap* gamepad_2)
-//		getGamepadInput(GamepadInputMap*gamepad_1, GamepadInputMap* gamepad_2, GamepadInputMap* gamepad_3)
-//		getGamepadInput(GamepadInputMap*gamepad_1, GamepadInputMap* gamepad_2, GamepadInputMap* gamepad_3, GamepadInputMap* gamepad_4)

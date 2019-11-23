@@ -13,7 +13,6 @@ struct Win32_SoundOutput
 	int sample_hz;
 	int16_t sample_volume;
 	uint32_t sample_index;
-	int wave_period;
 	int sound_buffer_size;
 	int latency_sample_count;
 };

@@ -5,8 +5,8 @@
 
 #include "win32/win32_graphics.h"
 #include "win32/win32_sound.h"
+#include "win32/win32_gamepad.h"
 
-#include "input/gamepad.h"
 #include "game.h"
 
 
@@ -190,7 +190,6 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		sound_output.sample_hz = 256;
 		sound_output.sample_volume = 400;
 		sound_output.sample_index = 0;
-		sound_output.wave_period = sound_output.samples_per_second / sound_output.sample_hz;
 		sound_output.sound_buffer_size = sound_output.samples_per_second * sound_output.bytes_per_sample;
 		sound_output.latency_sample_count = sound_output.samples_per_second / 12;
 		
