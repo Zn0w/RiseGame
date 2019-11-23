@@ -1,6 +1,5 @@
 #include <windows.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <malloc.h>
 
 #include "win32/win32_graphics.h"
