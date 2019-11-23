@@ -4,6 +4,7 @@
 
 #include "win32/win32_graphics.h"
 #include "win32/win32_sound.h"
+#include "win32/win32_keyboard.h"
 #include "win32/win32_gamepad.h"
 
 #include "game.h"
@@ -52,56 +53,6 @@ LRESULT CALLBACK PrimaryWindowCallback(
 			bool is_down	= (lParam & (1 << 31)) == 0;
 			if (was_down != is_down)
 			{
-				if (VKCode == 'W')
-				{
-					if (was_down && !is_down)
-						OutputDebugStringA("W is released!\n");
-				}
-				else if (VKCode == 'A')
-				{
-
-				}
-				else if (VKCode == 'S')
-				{
-
-				}
-				else if (VKCode == 'D')
-				{
-
-				}
-				else if (VKCode == 'Q')
-				{
-
-				}
-				else if (VKCode == 'E')
-				{
-
-				}
-				else if (VKCode == VK_UP)
-				{
-
-				}
-				else if (VKCode == VK_DOWN)
-				{
-
-				}
-				else if (VKCode == VK_LEFT)
-				{
-
-				}
-				else if (VKCode == VK_RIGHT)
-				{
-
-				}
-				else if (VKCode == VK_SPACE)
-				{
-
-				}
-				else if (VKCode == VK_ESCAPE)
-				{
-
-				}
-
 				// handle the close operation with alt+F4
 				bool alt_key_was_down = (lParam & (1 << 29)) != 0;
 				if ((VKCode == VK_F4) && alt_key_was_down)
@@ -109,6 +60,8 @@ LRESULT CALLBACK PrimaryWindowCallback(
 					running = false;
 				}
 			}
+
+			getKeyboardInput(VKCode, was_down, is_down);
 		} break;
 
 		/*case WM_SETCURSOR:
@@ -261,7 +214,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			sound_buffer.sample_count = bytes_to_write / sound_output.bytes_per_sample;
 			sound_buffer.samples_buffer = samples;
 			
-			game_update_and_render(1.0f, &graphics_buffer, &sound_buffer);
+			game_update_and_render(1.0f, &graphics_buffer, &sound_buffer, &keyboard);
 
 			// DirectSound output test (sine wave)
 			if (sound_is_valid)

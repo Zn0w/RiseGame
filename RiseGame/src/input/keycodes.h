@@ -1,6 +1,6 @@
 #pragma once
 
-#define MAX_KEYS 52
+#define RG_MAX_KEYS 52
 
 #define RG_A			1
 #define RG_B			2
@@ -35,15 +35,15 @@
 #define RG_RIGHT		30
 
 #define RG_1			31
-#define RG_1			32
-#define RG_1			33
-#define RG_1			34
-#define RG_1			35
-#define RG_1			36
-#define RG_1			37
-#define RG_1			38
-#define RG_1			39
-#define RG_1			40
+#define RG_2			32
+#define RG_3			33
+#define RG_4			34
+#define RG_5			35
+#define RG_6			36
+#define RG_7			37
+#define RG_8			38
+#define RG_9			39
+#define RG_0			40
 #define RG_MINUS		41
 #define RG_PLUS			42
 
