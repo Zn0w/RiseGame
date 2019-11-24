@@ -28,7 +28,7 @@ static xinput_set_state* XInputSetState_ = xinput_set_state_stub;
 #define XInputSetState XInputSetState_
 
 
-void LoadXInput()
+static void LoadXInput()
 {
 	HMODULE XInputLibrary = LoadLibrary("xinput1_4.dll");
 	// if version 1.4 of xinput is not supported by the os, load version 1.3
@@ -47,7 +47,7 @@ void LoadXInput()
 		OutputDebugStringA("Failed to load an XInput library\n");
 }
 
-void getGamepadInput(GamepadInputMap* gamepad_input)
+static void getGamepadInput(GamepadInputMap* gamepad_input)
 {
 	// get gamepad input
 	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)

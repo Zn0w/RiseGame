@@ -8,7 +8,7 @@
 static KeyboardInputMap keyboard = {};
 
 
-void getKeyboardInput(uint32_t VKCode, bool was_down, bool is_down)
+static void getKeyboardInput(uint32_t VKCode, bool was_down, bool is_down)
 {	
 	if (was_down != is_down)
 	{

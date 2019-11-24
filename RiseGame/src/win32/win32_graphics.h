@@ -22,7 +22,7 @@ struct WindowDimensions
 static Win32_BitmapBuffer backbuffer;
 
 
-WindowDimensions getWindowDimensions(HWND window_handle)
+static WindowDimensions getWindowDimensions(HWND window_handle)
 {
 	RECT client_rect;
 	GetClientRect(window_handle, &client_rect);

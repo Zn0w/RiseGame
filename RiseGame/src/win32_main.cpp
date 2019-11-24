@@ -89,7 +89,7 @@ LRESULT CALLBACK PrimaryWindowCallback(
 	return result;
 }
 
-INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) // NOTE: MSDN
+INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) // NOTE: MSDN
 {
 	// load the XInput dll library
 	LoadXInput();
@@ -151,7 +151,17 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 
 		int16_t* samples = (int16_t*) VirtualAlloc(0, sound_output.sound_buffer_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-		running = true;
+		GameMemory game_memory = {};
+		game_memory.permanent_storage_size = Megabytes(64);
+		game_memory.permanent_storage = VirtualAlloc(0, game_memory.permanent_storage_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+		game_memory.transient_storage_size = Gigabytes((uint64_t)1);
+		game_memory.transient_storage = VirtualAlloc(0, game_memory.transient_storage_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+		if (samples && game_memory.permanent_storage && game_memory.transient_storage)
+			running = true;
+		else;
+			// log
 		
 		LARGE_INTEGER cpu_frequency;
 		QueryPerformanceFrequency(&cpu_frequency);
@@ -213,8 +223,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 			sound_buffer.samples_per_second = sound_output.samples_per_second;
 			sound_buffer.sample_count = bytes_to_write / sound_output.bytes_per_sample;
 			sound_buffer.samples_buffer = samples;
-			
-			game_update_and_render(1.0f, &graphics_buffer, &sound_buffer, &keyboard);
+
+			game_update_and_render(1.0f, &game_memory, &graphics_buffer, &sound_buffer, &keyboard);
 
 			// DirectSound output test (sine wave)
 			if (sound_is_valid)

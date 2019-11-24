@@ -24,7 +24,7 @@ static LPDIRECTSOUNDBUFFER win32_sound_buffer;
 // Load DirectSound library
 typedef HRESULT WINAPI dsound_create(LPCGUID pcGuidDevice, LPDIRECTSOUND* ppDS, LPUNKNOWN pUnkOuter);
 
-void win32_InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32_t sound_buffer_size_in_bytes)
+static void win32_InitDirectSound(HWND window_handle, uint32_t samples_per_sec, uint32_t sound_buffer_size_in_bytes)
 {
 	// load the DirectSound library
 	HMODULE DirectSoundLibrary = LoadLibrary("dsound.dll");
