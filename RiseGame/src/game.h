@@ -5,7 +5,7 @@
 #include "memory/memory.h"
 #include "graphics/bitmap_graphics.h"
 #include "sound/sound.h"
-#include "input/keyboard.h"
+#include "input/input.h"
 
 
 struct GameState

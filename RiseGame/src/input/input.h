@@ -2,6 +2,22 @@
 
 #include <stdint.h>
 
+#include "keycodes.h"
+
+
+// TODO : make a struct that combines the input (e.g. keyboard + mouse)
+
+struct KeyState
+{
+	uint8_t is_down : 4;
+	uint8_t was_down : 4;
+};
+
+
+struct KeyboardInputMap
+{
+	KeyState keys[RG_MAX_KEYS];
+};
 
 struct GamepadInputMap {
 	struct {
