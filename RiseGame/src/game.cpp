@@ -29,6 +29,9 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	if (file_contents)
 		close_file(file_contents);
 
+	char filepath_2[] = "d:/test_risegame.txt";
+	debug_platform_write_file(filepath_2, 21, (void*)"Hello from RiseGame!");
+
 	
 	if (keyboard->keys[RG_UP].is_down && !keyboard->keys[RG_UP].was_down)
 		game_state->sample_volume = 1000;

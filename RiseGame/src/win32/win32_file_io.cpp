@@ -41,9 +41,27 @@ void* debug_platform_read_file(char* filepath)
 	return result;
 }
 
-void debug_platform_write_file(char* filepath, uint32_t memory_size, void* memory)
+bool debug_platform_write_file(char* filepath, uint32_t memory_size, void* memory)
 {
-	
+	bool result = false;
+
+	HANDLE file_handle = CreateFile(filepath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+	if (file_handle != INVALID_HANDLE_VALUE)
+	{
+		DWORD bytes_written;
+		if (WriteFile(file_handle, memory, memory_size, &bytes_written, 0))
+		{
+			result = bytes_written == memory_size;
+		}
+		else
+		{
+			// log
+		}
+
+		CloseHandle(file_handle);
+	}
+
+	return result;
 }
 
 void close_file(void* memory)
