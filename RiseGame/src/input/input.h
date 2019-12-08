@@ -45,3 +45,9 @@ struct GamepadInputMap {
 	uint16_t thumb_right_x;
 	uint16_t thumb_right_y;
 };
+
+struct GameInput
+{
+	KeyboardInputMap keyboard;
+	GamepadInputMap* gamepad;	// array of 4 gamepads
+};

@@ -11,7 +11,7 @@ void game_init()
 	// init the game entities and subsystems
 }
 
-void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, KeyboardInputMap* keyboard)
+void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
 {
 	assert(sizeof(GameState) <= memory->permanent_storage_size);
 	
@@ -33,14 +33,14 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	debug_platform_write_file(filepath_2, 21, (void*)"Hello from RiseGame!");
 
 	
-	if (keyboard->keys[RG_UP].is_down && !keyboard->keys[RG_UP].was_down)
+	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
 		game_state->sample_volume = 1000;
-	else if (keyboard->keys[RG_DOWN].is_down && !keyboard->keys[RG_DOWN].was_down)
+	else if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
 		game_state->sample_volume = 100;
 	
-	if (keyboard->keys[RG_RIGHT].is_down && !keyboard->keys[RG_RIGHT].was_down)
+	if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
 		game_state->sample_hz = 500;
-	else if (keyboard->keys[RG_LEFT].is_down && !keyboard->keys[RG_LEFT].was_down)
+	else if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
 		game_state->sample_hz = 50;
 
 	outputSound(sound_buffer, game_state->sample_volume, game_state->sample_hz);

@@ -185,8 +185,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 			}
 
 			// get gamepad input
-			GamepadInputMap gamepad_input;
-			getGamepadInput(&gamepad_input);
+			GamepadInputMap gamepad_input[4];
+			getGamepadInput(gamepad_input);
+			game_input.gamepad = gamepad_input;
 			
 			BitmapBuffer graphics_buffer = {};
 			graphics_buffer.memory = backbuffer.memory;
@@ -224,7 +225,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 			sound_buffer.sample_count = bytes_to_write / sound_output.bytes_per_sample;
 			sound_buffer.samples_buffer = samples;
 
-			game_update_and_render(1.0f, &game_memory, &graphics_buffer, &sound_buffer, &keyboard);
+			game_update_and_render(1.0f, &game_memory, &graphics_buffer, &sound_buffer, &game_input);
 
 			// DirectSound output test (sine wave)
 			if (sound_is_valid)

@@ -15,7 +15,7 @@ struct GameState
 };
 
 void game_init();
-void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, KeyboardInputMap* keyboard);
+void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input);
 void game_destroy();
 
 // returns a user-defined resolution

@@ -58,34 +58,34 @@ static void getGamepadInput(GamepadInputMap* gamepad_input)
 		// Get the state of the controller from XInput
 		if (XInputGetState(i, &controller_state) == ERROR_SUCCESS)	// Controller is connected
 		{
-			*gamepad_input = {};
+			gamepad_input[i] = {};
 
-			gamepad_input->buttons.up = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
-			gamepad_input->buttons.down = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
-			gamepad_input->buttons.left = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
-			gamepad_input->buttons.right = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
-			gamepad_input->buttons.start = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_START);
-			gamepad_input->buttons.back = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK);
-			gamepad_input->buttons.left_thumb = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
-			gamepad_input->buttons.right_thumb = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
-			gamepad_input->buttons.left_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
-			gamepad_input->buttons.right_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
-			gamepad_input->buttons.a_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A);
-			gamepad_input->buttons.b_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B);
-			gamepad_input->buttons.x_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_X);
-			gamepad_input->buttons.y_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
-
-			gamepad_input->left_trigger = controller_state.Gamepad.bLeftTrigger;
-			gamepad_input->right_trigger = controller_state.Gamepad.bRightTrigger;
-
-			gamepad_input->thumb_left_x = controller_state.Gamepad.sThumbLX;
-			gamepad_input->thumb_left_y = controller_state.Gamepad.sThumbLY;
-			gamepad_input->thumb_right_x = controller_state.Gamepad.sThumbRX;
-			gamepad_input->thumb_right_y = controller_state.Gamepad.sThumbRY;
+			gamepad_input[i].buttons.up = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
+			gamepad_input[i].buttons.down = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+			gamepad_input[i].buttons.left = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
+			gamepad_input[i].buttons.right = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+			gamepad_input[i].buttons.start = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_START);
+			gamepad_input[i].buttons.back = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK);
+			gamepad_input[i].buttons.left_thumb = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
+			gamepad_input[i].buttons.right_thumb = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
+			gamepad_input[i].buttons.left_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+			gamepad_input[i].buttons.right_shoulder = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+			gamepad_input[i].buttons.a_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_A);
+			gamepad_input[i].buttons.b_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_B);
+			gamepad_input[i].buttons.x_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_X);
+			gamepad_input[i].buttons.y_button = (controller_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
+						 	
+			gamepad_input[i].left_trigger = controller_state.Gamepad.bLeftTrigger;
+			gamepad_input[i].right_trigger = controller_state.Gamepad.bRightTrigger;
+						 	
+			gamepad_input[i].thumb_left_x = controller_state.Gamepad.sThumbLX;
+			gamepad_input[i].thumb_left_y = controller_state.Gamepad.sThumbLY;
+			gamepad_input[i].thumb_right_x = controller_state.Gamepad.sThumbRX;
+			gamepad_input[i].thumb_right_y = controller_state.Gamepad.sThumbRY;
 		}
 		else	// Controller is not connected 
 		{
-
+			
 		}
 	}
 }
