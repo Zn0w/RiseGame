@@ -5,6 +5,7 @@
 
 #include "../game.h"
 
+
 static KeyboardInputMap keyboard = {};
 
 

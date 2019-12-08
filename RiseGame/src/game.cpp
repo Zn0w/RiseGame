@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include "utils/file_io.h"
+
 
 void game_init()
 {
@@ -21,6 +23,12 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 
 		memory->is_initialized = true;
 	}
+
+	char filepath[] = __FILE__;
+	void* file_contents = debug_platform_read_file(filepath);
+	if (file_contents)
+		close_file(file_contents);
+
 	
 	if (keyboard->keys[RG_UP].is_down && !keyboard->keys[RG_UP].was_down)
 		game_state->sample_volume = 1000;
