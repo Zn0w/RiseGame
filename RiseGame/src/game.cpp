@@ -44,7 +44,32 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		game_state->sample_hz = 50;
 
 	outputSound(sound_buffer, game_state->sample_volume, game_state->sample_hz);
-	render_background(graphics_buffer, 100, 150, 200);
+	render_background(graphics_buffer, { 100, 150, 200 });
+
+	// draw a tile map
+	uint8_t map[9][16] = {
+		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	};
+
+	uint8_t size = 80;
+	for (int y = 0; y < 9; y++)
+	{
+		for (int x = 0; x < 16; x++)
+		{
+			if (map[y][x])
+				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 100, 250, 100 });
+			else
+				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 250, 100, 100 });
+		}
+	}
 }
 
 void game_destroy()
