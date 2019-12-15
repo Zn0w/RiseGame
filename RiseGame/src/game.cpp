@@ -9,6 +9,13 @@ void game_init()
 	// for now it's hardcoded
 
 	// init the game entities and subsystems
+
+	player.transform_component.position.x = 500;
+	player.transform_component.position.y = 500;
+
+	player.color_component.color.x = 100;
+	player.color_component.color.y = 100;
+	player.color_component.color.z = 230;
 }
 
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
@@ -70,6 +77,25 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 250, 100, 100 });
 		}
 	}
+
+	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
+		add(&player.transform_component.position, { 0, -5 });
+	else if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
+		add(&player.transform_component.position, { 0, 5 });
+
+	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
+		add(&player.transform_component.position, { -5, 0 });
+	else if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
+		add(&player.transform_component.position, { 5, 0 });
+
+	render_rectangle(
+		graphics_buffer,
+		player.transform_component.position.x,
+		player.transform_component.position.y,
+		player.transform_component.position.x + size,
+		player.transform_component.position.y + size,
+		{ player.color_component.color.x, player.color_component.color.y, player.color_component.color.z }
+	);
 }
 
 void game_destroy()

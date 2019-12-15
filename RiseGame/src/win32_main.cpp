@@ -155,7 +155,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 		game_memory.permanent_storage_size = Megabytes(64);
 		game_memory.permanent_storage = VirtualAlloc(0, game_memory.permanent_storage_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-		game_memory.transient_storage_size = Gigabytes((uint64_t)1);
+		game_memory.transient_storage_size = Megabytes((uint64_t)500);
 		game_memory.transient_storage = VirtualAlloc(0, game_memory.transient_storage_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 		if (samples && game_memory.permanent_storage && game_memory.transient_storage)
@@ -170,6 +170,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 		QueryPerformanceCounter(&last_counter);
 
 		uint64_t last_cycle_count = __rdtsc();
+
+		game_init();
 
 		while (running)
 		{

@@ -7,12 +7,16 @@
 #include "sound/sound.h"
 #include "input/input.h"
 
+#include "ecs/entity.h"
+
 
 struct GameState
 {
 	int16_t sample_volume;
 	int sample_hz;
 };
+
+static Player player;
 
 void game_init();
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input);
