@@ -1,10 +1,10 @@
 #pragma once
 
-#include "component.h"
+#include "../math/math.h"
 
 
-struct Player
+struct Entity
 {
-	TransformComponent transform_component;
-	ColorComponent color_component;
+	vec4 dimensions;	// x, y, w, h (NOT x + w, y + h)
+	vec3 color;
 };

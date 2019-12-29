@@ -10,12 +10,31 @@ void game_init()
 
 	// init the game entities and subsystems
 
-	player.transform_component.position.x = 500;
-	player.transform_component.position.y = 500;
+	player.dimensions.x = 500;
+	player.dimensions.y = 500;
 
-	player.color_component.color.x = 100;
-	player.color_component.color.y = 100;
-	player.color_component.color.z = 230;
+	player.dimensions.w = 50;
+	player.dimensions.h = 50;
+
+	player.color.x = 100;
+	player.color.y = 100;
+	player.color.z = 230;
+
+	test_zombie.dimensions.x = 0;
+	test_zombie.dimensions.y = 500;
+
+	test_zombie.dimensions.w = 50;
+	test_zombie.dimensions.h = 50;
+
+	test_zombie.color.x = 30;
+	test_zombie.color.y = 200;
+	test_zombie.color.z = 100;
+}
+
+void updatePlayer(vec2* speed)
+{
+	player.dimensions.x += speed->x;
+	player.dimensions.y += speed->y;
 }
 
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
@@ -78,23 +97,38 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		}
 	}
 
+	vec2 speed = { 0, 1 }; // 1 on y is gravity
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
-		add(&player.transform_component.position, { 0, -5 });
+		speed.y += -5;
 	else if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
-		add(&player.transform_component.position, { 0, 5 });
+		speed.y += 5;
 
 	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
-		add(&player.transform_component.position, { -5, 0 });
+		speed.x += -5;
 	else if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
-		add(&player.transform_component.position, { 5, 0 });
+		speed.x += 5;
+
+	vec2 zombie_speed = {3, 3};
+
+	updatePlayer(&speed);
+	updateZombie(&test_zombie.dimensions.x, &test_zombie.dimensions.y, player.dimensions.x, player.dimensions.y, zombie_speed);
 
 	render_rectangle(
 		graphics_buffer,
-		player.transform_component.position.x,
-		player.transform_component.position.y,
-		player.transform_component.position.x + size,
-		player.transform_component.position.y + size,
-		{ player.color_component.color.x, player.color_component.color.y, player.color_component.color.z }
+		player.dimensions.x,
+		player.dimensions.y,
+		player.dimensions.x + player.dimensions.w,
+		player.dimensions.y + player.dimensions.h,
+		{ player.color.x, player.color.y, player.color.z }
+	);
+
+	render_rectangle(
+		graphics_buffer,
+		test_zombie.dimensions.x,
+		test_zombie.dimensions.y,
+		test_zombie.dimensions.x + test_zombie.dimensions.w,
+		test_zombie.dimensions.y + test_zombie.dimensions.h,
+		{ test_zombie.color.x, test_zombie.color.y, test_zombie.color.z }
 	);
 }
 

@@ -9,6 +9,8 @@
 
 #include "ecs/entity.h"
 
+#include "game_logic/zombie.h"
+
 
 struct GameState
 {
@@ -16,7 +18,9 @@ struct GameState
 	int sample_hz;
 };
 
-static Player player;
+static Entity player;
+static Entity test_zombie;
+void updatePlayer(vec2*);
 
 void game_init();
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input);

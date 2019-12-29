@@ -1,9 +1,11 @@
 #pragma once
 
+#include <stdlib.h>
+
 
 struct vec2
 {
-	int x, y;
+	int32_t x, y;
 };
 
 static void add(vec2* a, vec2 b)
@@ -14,5 +16,10 @@ static void add(vec2* a, vec2 b)
 
 struct vec3
 {
-	int x, y, z;
+	int32_t x, y, z;
+};
+
+struct vec4
+{
+	int32_t x, y, w, h;
 };
