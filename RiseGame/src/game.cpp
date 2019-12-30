@@ -3,6 +3,8 @@
 #include "utils/file_io.h"
 
 
+RGBColor colors[2] = { { 50, 100, 230 }, {30, 200, 100} };
+
 void game_init()
 {
 	// TODO : fetch the file with user settings(e.g. screen resolution, display mode (fullscreen, windowed), controls scheme)
@@ -10,31 +12,32 @@ void game_init()
 
 	// init the game entities and subsystems
 
-	player.dimensions.x = 500;
-	player.dimensions.y = 500;
+	player.position.x = 500;
+	player.position.y = 500;
 
-	player.dimensions.w = 50;
-	player.dimensions.h = 50;
+	player.size.x = 50;
+	player.size.y = 50;
 
-	player.color.x = 100;
-	player.color.y = 100;
-	player.color.z = 230;
+	player.color_id = 0;
 
-	test_zombie.dimensions.x = 0;
-	test_zombie.dimensions.y = 500;
 
-	test_zombie.dimensions.w = 50;
-	test_zombie.dimensions.h = 50;
+	test_zombie.position.x = 0;
+	test_zombie.position.y = 500;
 
-	test_zombie.color.x = 30;
-	test_zombie.color.y = 200;
-	test_zombie.color.z = 100;
+	test_zombie.size.x = 50;
+	test_zombie.size.y = 50;
+
+	test_zombie.velocity = { 3, 3 };
+
+	test_zombie.color_id = 1;
 }
 
-void updatePlayer(vec2* speed)
+void updatePlayer()
 {
-	player.dimensions.x += speed->x;
-	player.dimensions.y += speed->y;
+	add(&player.position, player.velocity);
+	
+	// gravity
+	player.velocity = {0, 1};
 }
 
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
@@ -97,38 +100,35 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		}
 	}
 
-	vec2 speed = { 0, 1 }; // 1 on y is gravity
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
-		speed.y += -5;
+		player.velocity.y += -5;
 	else if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
-		speed.y += 5;
+		player.velocity.y += 5;
 
 	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
-		speed.x += -5;
+		player.velocity.x += -5;
 	else if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
-		speed.x += 5;
+		player.velocity.x += 5;
 
-	vec2 zombie_speed = {3, 3};
-
-	updatePlayer(&speed);
-	updateZombie(&test_zombie.dimensions.x, &test_zombie.dimensions.y, player.dimensions.x, player.dimensions.y, zombie_speed);
+	updatePlayer();
+	updateZombie(&test_zombie.position, player.position, test_zombie.velocity);
 
 	render_rectangle(
 		graphics_buffer,
-		player.dimensions.x,
-		player.dimensions.y,
-		player.dimensions.x + player.dimensions.w,
-		player.dimensions.y + player.dimensions.h,
-		{ player.color.x, player.color.y, player.color.z }
+		player.position.x,
+		player.position.y,
+		player.position.x + player.size.x,
+		player.position.y + player.size.y,
+		{ colors[player.color_id] }
 	);
 
 	render_rectangle(
 		graphics_buffer,
-		test_zombie.dimensions.x,
-		test_zombie.dimensions.y,
-		test_zombie.dimensions.x + test_zombie.dimensions.w,
-		test_zombie.dimensions.y + test_zombie.dimensions.h,
-		{ test_zombie.color.x, test_zombie.color.y, test_zombie.color.z }
+		test_zombie.position.x,
+		test_zombie.position.y,
+		test_zombie.position.x + test_zombie.size.x,
+		test_zombie.position.y + test_zombie.size.y,
+		{ colors[test_zombie.color_id] }
 	);
 }
 

@@ -5,19 +5,12 @@
 #include "../math/math.h"
 
 
-static void updateZombie(int32_t* x, int32_t* y, int32_t target_x, int32_t target_y, vec2 speed)
+static void updateZombie(vec2* position, vec2 target, vec2 velocity_scalar)
 {
-	if (*x > target_x)
-	{
-		*x -= speed.x;
-	}
-	else
-		*x += speed.x;
+	if (position->x > target.x)
+		velocity_scalar.x *= -1;
+	if (position->y > target.y)
+		velocity_scalar.y *= -1;
 
-	if (*y > target_y)
-	{
-		*y -= speed.y;
-	}
-	else
-		*y += speed.y;
+	add(position, velocity_scalar);
 }

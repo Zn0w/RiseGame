@@ -5,6 +5,8 @@
 
 struct Entity
 {
-	vec4 dimensions;	// x, y, w, h (NOT x + w, y + h)
-	vec3 color;
+	vec2 position;
+	vec2 size;
+	vec2 velocity;
+	uint8_t color_id;
 };
