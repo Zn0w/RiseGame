@@ -23,3 +23,9 @@ struct vec4
 {
 	int32_t x, y, w, h;
 };
+
+
+static uint32_t roundFloatToUInt32(float value)
+{
+	return (uint32_t)(value + 0.5f);
+}

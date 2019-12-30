@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "../math/math.h"
+
 
 struct BitmapBuffer
 {
@@ -12,9 +14,9 @@ struct BitmapBuffer
 
 struct RGBColor
 {
-	int red;
-	int green;
-	int blue;
+	uint32_t red;
+	uint32_t green;
+	uint32_t blue;
 };
 
 
@@ -62,23 +64,17 @@ static void render_rectangle(BitmapBuffer* buffer, int32_t min_x, int32_t min_y,
 	if (max_y > buffer->height)
 		max_y = buffer->height;
 
+	uint32_t raw_color = (roundFloatToUInt32(color.red * 255.0f) << 16) |
+						 (roundFloatToUInt32(color.green * 255.0f) << 8) |
+						 (roundFloatToUInt32(color.blue * 255.0f) << 0);
+	
 	uint8_t* row = (uint8_t*)buffer->memory + min_x * bytes_per_pixel + min_y * buffer->pitch;
 	for (int y = min_y; y < max_y; y++)
 	{
-		uint8_t* pixel = (uint8_t*)row;
+		uint32_t* pixel = (uint32_t*)row;
 		for (int x = min_x; x < max_x; x++)
 		{
-			*pixel = color.blue;
-			++pixel;
-
-			*pixel = color.green;
-			++pixel;
-
-			*pixel = color.red;
-			++pixel;
-
-			*pixel = 0;
-			++pixel;
+			*pixel++ = raw_color;
 		}
 		row += buffer->pitch;
 	}
