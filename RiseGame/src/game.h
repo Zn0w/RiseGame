@@ -7,6 +7,8 @@
 #include "sound/sound.h"
 #include "input/input.h"
 
+#include "graphics/renderable.h"
+
 #include "ecs/entity.h"
 
 #include "game_logic/zombie.h"

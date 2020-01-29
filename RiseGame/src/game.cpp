@@ -3,7 +3,7 @@
 #include "utils/file_io.h"
 
 
-RGBColor colors[2] = { { 50, 100, 230 }, {30, 200, 100} };
+Renderable renderables[2] = { {{ 0.2f, 0.2f, 0.8f }, 0}, {{0.2f, 0.8f, 0.4f}, 1} };
 
 void game_init()
 {
@@ -18,7 +18,7 @@ void game_init()
 	player.size.x = 50;
 	player.size.y = 50;
 
-	player.color_id = 0;
+	player.render_id = 0;
 
 
 	test_zombie.position.x = 0;
@@ -29,7 +29,7 @@ void game_init()
 
 	test_zombie.velocity = { 3, 3 };
 
-	test_zombie.color_id = 1;
+	test_zombie.render_id = 1;
 }
 
 void updatePlayer()
@@ -94,9 +94,9 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		for (int x = 0; x < 16; x++)
 		{
 			if (map[y][x])
-				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 100, 250, 100 });
+				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 1.0f, 0.0f, 0.0f });
 			else
-				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 250, 100, 100 });
+				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 0.0f, 0.0f, 1.0f });
 		}
 	}
 
@@ -119,7 +119,7 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		player.position.y,
 		player.position.x + player.size.x,
 		player.position.y + player.size.y,
-		{ colors[player.color_id] }
+		{ renderables[player.render_id].color }
 	);
 
 	render_rectangle(
@@ -128,7 +128,7 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		test_zombie.position.y,
 		test_zombie.position.x + test_zombie.size.x,
 		test_zombie.position.y + test_zombie.size.y,
-		{ colors[test_zombie.color_id] }
+		{ renderables[test_zombie.render_id].color }
 	);
 }
 

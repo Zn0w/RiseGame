@@ -14,9 +14,9 @@ struct BitmapBuffer
 
 struct RGBColor
 {
-	uint32_t red;
-	uint32_t green;
-	uint32_t blue;
+	float red;
+	float green;
+	float blue;
 };
 
 
