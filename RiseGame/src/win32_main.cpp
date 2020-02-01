@@ -96,9 +96,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 	
 	WNDCLASSA window_class = {};	// init every member to 0
 
-	int screen_width = 1600;
-	int screen_height = 900;
-
 	// TODO: apply the user-defined resolution
 	// TODO: calculate x and y for a window origin to be in center
 	

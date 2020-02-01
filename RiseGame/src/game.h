@@ -7,11 +7,15 @@
 #include "sound/sound.h"
 #include "input/input.h"
 
-#include "graphics/renderable.h"
+#include "graphics/renderer.h"
 
 #include "ecs/entity.h"
 
 #include "game_logic/zombie.h"
+
+
+static int screen_width = 1600;
+static int screen_height = 900;
 
 
 struct GameState
