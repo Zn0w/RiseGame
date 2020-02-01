@@ -25,26 +25,17 @@ static int bytes_per_pixel = 4;
 
 static void render_background(BitmapBuffer* buffer, RGBColor color)
 {
+	uint32_t raw_color = (roundFloatToUInt32(color.red * 255.0f) << 16) |
+		(roundFloatToUInt32(color.green * 255.0f) << 8) |
+		(roundFloatToUInt32(color.blue * 255.0f) << 0);
+	
 	uint8_t* row = (uint8_t*)buffer->memory;
 	for (int y = 0; y < buffer->height; y++)
 	{
-		uint8_t* pixel = (uint8_t*)row;
+		uint32_t* pixel = (uint32_t*)row;
 		for (int x = 0; x < buffer->width; x++)
 		{
-			// NOTE : little endian architecture
-			//		  pixel in memory : BB GG RR xx
-			//					  blue  green  red  pad byte
-			*pixel = color.blue;
-			++pixel;
-
-			*pixel = color.green;
-			++pixel;
-
-			*pixel = color.red;
-			++pixel;
-
-			*pixel = 0;
-			++pixel;
+			*pixel++ = raw_color;
 		}
 		row += buffer->pitch;
 	}

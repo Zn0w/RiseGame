@@ -3,7 +3,35 @@
 #include "utils/file_io.h"
 
 
-Renderable renderables[2] = { {{ 0.2f, 0.2f, 0.8f }, 0}, {{0.2f, 0.8f, 0.4f}, 1} };
+RenderResource render_resources[2] = { {{ 0.2f, 0.2f, 0.8f }, 0}, {{0.2f, 0.8f, 0.4f}, 1} };
+
+// tile map
+const uint32_t map_width = 32, map_height = 18;
+const uint32_t tile_size = 50;
+
+#define TILE(x) ((x) * tile_size)
+
+uint8_t map[map_height][map_width] = {
+	{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1 },
+	{ 1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
+	{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
+};
+
 
 void game_init()
 {
@@ -12,11 +40,9 @@ void game_init()
 
 	// init the game entities and subsystems
 
-	player.position.x = 500;
-	player.position.y = 500;
+	player.position = {500, 500};
 
-	player.size.x = 50;
-	player.size.y = 50;
+	player.size = {TILE(1), TILE(1)};
 
 	player.render_id = 0;
 
@@ -27,7 +53,7 @@ void game_init()
 	test_zombie.size.x = 50;
 	test_zombie.size.y = 50;
 
-	test_zombie.velocity = { 3, 3 };
+	test_zombie.velocity = {3, 3};
 
 	test_zombie.render_id = 1;
 }
@@ -53,6 +79,8 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		memory->is_initialized = true;
 	}
 
+#define FILE_IO_TEST 0
+#if FILE_IO_TEST == 1
 	char filepath[] = __FILE__;
 	void* file_contents = debug_platform_read_file(filepath);
 	if (file_contents)
@@ -60,8 +88,10 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 
 	char filepath_2[] = "d:/test_risegame.txt";
 	debug_platform_write_file(filepath_2, 21, (void*)"Hello from RiseGame!");
-
+#endif
 	
+#define AUDIO_TEST 0
+#if AUDIO_TEST == 1
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
 		game_state->sample_volume = 1000;
 	else if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
@@ -73,30 +103,23 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		game_state->sample_hz = 50;
 
 	outputSound(sound_buffer, game_state->sample_volume, game_state->sample_hz);
-	render_background(graphics_buffer, { 100, 150, 200 });
+#endif
 
-	// draw a tile map
-	uint8_t map[9][16] = {
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	};
-
-	uint8_t size = 80;
-	for (int y = 0; y < 9; y++)
+	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
+	
+	for (int y = 0; y < map_height; y++)
 	{
-		for (int x = 0; x < 16; x++)
+		for (int x = 0; x < map_width; x++)
 		{
+			uint32_t pixel_x = x * tile_size;
+			uint32_t pixel_y = y * tile_size;
+			uint32_t pixel_width = x * tile_size + tile_size;
+			uint32_t pixel_height = y * tile_size + tile_size;
+
 			if (map[y][x])
-				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 1.0f, 0.0f, 0.0f });
+				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 1.0f, 0.0f, 0.0f });
 			else
-				render_rectangle(graphics_buffer, x * size, y * size, x * size + size, y * size + size, { 0.0f, 0.0f, 1.0f });
+				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 0.0f, 0.0f, 1.0f });
 		}
 	}
 
@@ -119,7 +142,7 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		player.position.y,
 		player.position.x + player.size.x,
 		player.position.y + player.size.y,
-		{ renderables[player.render_id].color }
+		{ render_resources[player.render_id].color }
 	);
 
 	render_rectangle(
@@ -128,7 +151,7 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		test_zombie.position.y,
 		test_zombie.position.x + test_zombie.size.x,
 		test_zombie.position.y + test_zombie.size.y,
-		{ renderables[test_zombie.render_id].color }
+		{ render_resources[test_zombie.render_id].color }
 	);
 }
 
