@@ -157,15 +157,8 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	render_tilemap(&tilemap, graphics_buffer, camera);
 
 
-	// render player relative to camera, not the world (player.position is player's position in the world, not the screen)
-	render_rectangle(
-		graphics_buffer,
-		(screen_width - player.size.x) / 2,
-		(screen_height - player.size.y) / 2,
-		(screen_width + player.size.x) / 2,
-		(screen_height + player.size.y) / 2,
-		{ render_resources[player.render_id].color }
-	);
+	// render player
+	render_entity(graphics_buffer, player, camera, render_resources[player.render_id]);
 
 	render_rectangle(
 		graphics_buffer,
