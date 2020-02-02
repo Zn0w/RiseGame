@@ -3,7 +3,7 @@
 #include "utils/file_io.h"
 
 
-RenderResource render_resources[2] = { {{ 0.2f, 0.2f, 0.8f }, 0}, {{0.2f, 0.8f, 0.4f}, 1} };
+RenderResource render_resources[4] = { { { 1.0f, 1.0f, 0.0f }, 0 }, { { 1.0f, 0.0f, 1.0f }, 1 }, { { 0.2f, 0.2f, 0.8f }, 2}, {{0.2f, 0.8f, 0.4f}, 3} };
 
 // tile map
 const uint32_t map_width = 64, map_height = 32;
@@ -72,7 +72,7 @@ void game_init()
 
 	player.size = tiles_to_pixels(1, 1);
 
-	player.render_id = 0;
+	player.render_id = 2;
 
 
 	test_zombie.position.x = 0;
@@ -83,7 +83,7 @@ void game_init()
 
 	test_zombie.velocity = {3, 3};
 
-	test_zombie.render_id = 1;
+	test_zombie.render_id = 3;
 
 	camera.width = visible_tiles_x * tilemap.tile_size.x;
 	camera.height = visible_tiles_y * tilemap.tile_size.y;
@@ -154,20 +154,13 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
 	link_camera(&camera, player, tilemap);
 
-	render_tilemap(&tilemap, graphics_buffer, camera);
+	render_tilemap(&tilemap, graphics_buffer, camera, render_resources);
 
 
 	// render player
 	render_entity(graphics_buffer, player, camera, render_resources[player.render_id]);
 
-	render_rectangle(
-		graphics_buffer,
-		test_zombie.position.x,
-		test_zombie.position.y,
-		test_zombie.position.x + test_zombie.size.x,
-		test_zombie.position.y + test_zombie.size.y,
-		{ render_resources[test_zombie.render_id].color }
-	);
+	render_entity(graphics_buffer, test_zombie, camera, render_resources[test_zombie.render_id]);
 }
 
 void game_destroy()

@@ -50,14 +50,14 @@ static void link_camera(Camera* camera, Entity entity, Tilemap tilemap)
 		camera->offset_y = tilemap.height * tilemap.tile_size.y - camera->height;
 }
 
-static void render_tilemap(Tilemap* tilemap, BitmapBuffer* graphics_buffer, Camera camera)
+static void render_tilemap(Tilemap* tilemap, BitmapBuffer* graphics_buffer, Camera camera, RenderResource* render_resources)
 {
 	// draw tilemap
 	for (int y = 0; y < (camera.height / tilemap->tile_size.y); y++)
 	{
 		for (int x = 0; x < (camera.width / tilemap->tile_size.x); x++)
 		{
-			uint32_t pixel_x = x * tilemap->tile_size.x;
+			/*uint32_t pixel_x = x * tilemap->tile_size.x;
 			uint32_t pixel_y = y * tilemap->tile_size.y;
 			uint32_t pixel_width = x * tilemap->tile_size.x + tilemap->tile_size.x;
 			uint32_t pixel_height = y * tilemap->tile_size.y + tilemap->tile_size.y;
@@ -65,7 +65,22 @@ static void render_tilemap(Tilemap* tilemap, BitmapBuffer* graphics_buffer, Came
 			if (tilemap->tiles[(y + camera.offset_y / tilemap->tile_size.y) * tilemap->width + (x + camera.offset_x / tilemap->tile_size.y)])
 				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 1.0f, 0.0f, 0.0f });
 			else
-				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 0.0f, 0.0f, 1.0f });
+				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 0.0f, 0.0f, 1.0f });*/
+
+			uint32_t pixel_x = camera.offset_x + x * tilemap->tile_size.x;
+			uint32_t pixel_y = camera.offset_y + y * tilemap->tile_size.y;
+			
+			int32_t relative_position_x = pixel_x - camera.offset_x;
+			int32_t relative_position_y = pixel_y - camera.offset_y;
+
+			render_rectangle(
+				graphics_buffer,
+				relative_position_x,
+				relative_position_y,
+				relative_position_x + tilemap->tile_size.x,
+				relative_position_y + tilemap->tile_size.y,
+				render_resources[tilemap->tiles[(y + camera.offset_y / tilemap->tile_size.y) * tilemap->width + (x + camera.offset_x / tilemap->tile_size.y)]].color
+			);
 		}
 	}
 }
@@ -85,11 +100,11 @@ static void render_entity(BitmapBuffer* graphics_buffer, Entity entity, Camera c
 
 		render_rectangle(
 			graphics_buffer,
-			relative_position_x,
-			relative_position_y,
-			relative_position_x + entity.size.x,
-			relative_position_y + entity.size.y,
-			{ resource.color }
+			relative_position_x - entity.size.x / 2,
+			relative_position_y - entity.size.y / 2,
+			relative_position_x + entity.size.x / 2,
+			relative_position_y + entity.size.y / 2,
+			resource.color
 		);
 	}
 }
