@@ -49,8 +49,8 @@ const uint32_t visible_tiles_y = 9;
 Tilemap tilemap = { map, map_width, map_height, {screen_width / visible_tiles_x, screen_height / visible_tiles_y } };
 
 
-const uint32_t camera_scale_x = map_width / visible_tiles_x;
-const uint32_t camera_scale_y = map_height / visible_tiles_y;
+//const uint32_t camera_scale_x = map_width / visible_tiles_x;
+//const uint32_t camera_scale_y = map_height / visible_tiles_y;
 
 Camera camera;
 
@@ -85,8 +85,8 @@ void game_init()
 
 	test_zombie.render_id = 1;
 
-	camera.width = visible_tiles_x;
-	camera.height = visible_tiles_y;
+	camera.width = visible_tiles_x * tilemap.tile_size.x;
+	camera.height = visible_tiles_y * tilemap.tile_size.y;
 	link_camera(&camera, player, tilemap);
 }
 
@@ -137,15 +137,16 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 #endif
 
 
+	const int32_t player_speed = 10;
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
-		player.velocity.y += -5;
+		player.velocity.y += -player_speed;
 	else if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
-		player.velocity.y += 5;
+		player.velocity.y += player_speed;
 
 	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
-		player.velocity.x += -5;
+		player.velocity.x += -player_speed;
 	else if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
-		player.velocity.x += 5;
+		player.velocity.x += player_speed;
 
 	updatePlayer();
 	updateZombie(&test_zombie.position, player.position, test_zombie.velocity);
@@ -159,10 +160,10 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	// render player relative to camera, not the world (player.position is player's position in the world, not the screen)
 	render_rectangle(
 		graphics_buffer,
-		(player.position.x - camera.offset_x) * tilemap.tile_size.x,	//camera.origin_x * tilemap.tile_size.x / 2,
-		(player.position.y - camera.offset_y) * tilemap.tile_size.y,	//camera.origin_y * tilemap.tile_size.y / 2,
-		(player.position.x - camera.offset_x) * tilemap.tile_size.x + tilemap.tile_size.x,	//camera.origin_x * tilemap.tile_size.x / 2 + player.size.x,
-		(player.position.y - camera.offset_y) * tilemap.tile_size.y + tilemap.tile_size.y,	//camera.origin_y * tilemap.tile_size.y / 2 + player.size.y,
+		(screen_width - player.size.x) / 2,
+		(screen_height - player.size.y) / 2,
+		(screen_width + player.size.x) / 2,
+		(screen_height + player.size.y) / 2,
 		{ render_resources[player.render_id].color }
 	);
 

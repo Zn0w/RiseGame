@@ -14,7 +14,7 @@ struct RenderResource
 	uint32_t id;	// depending on further implementation (storage of renderables), this may not be needed
 };
 
-// Tilemap camera, 1 unit = 1 tile
+
 struct Camera
 {
 	int32_t origin_x, origin_y;
@@ -33,8 +33,8 @@ struct Tilemap
 
 static void link_camera(Camera* camera, Entity entity, Tilemap tilemap)
 {
-	camera->origin_x = entity.position.x / tilemap.tile_size.x;
-	camera->origin_y = entity.position.y / tilemap.tile_size.y;
+	camera->origin_x = entity.position.x;
+	camera->origin_y = entity.position.y;
 
 	// top left corner position
 	camera->offset_x = camera->origin_x - (camera->width / 2);
@@ -44,25 +44,25 @@ static void link_camera(Camera* camera, Entity entity, Tilemap tilemap)
 		camera->offset_x = 0;
 	if (camera->offset_y < 0)
 		camera->offset_y = 0;
-	if (camera->offset_x > tilemap.width - camera->width)
-		camera->offset_x = tilemap.width - camera->width;
-	if (camera->offset_y > tilemap.height - camera->height)
-		camera->offset_y = tilemap.height - camera->height;
+	if (camera->offset_x > tilemap.width * tilemap.tile_size.x - camera->width)
+		camera->offset_x = tilemap.width * tilemap.tile_size.x - camera->width;
+	if (camera->offset_y > tilemap.height * tilemap.tile_size.y - camera->height)
+		camera->offset_y = tilemap.height * tilemap.tile_size.y - camera->height;
 }
 
 static void render_tilemap(Tilemap* tilemap, BitmapBuffer* graphics_buffer, Camera camera)
 {
 	// draw tilemap
-	for (int y = 0; y < camera.height; y++)
+	for (int y = 0; y < (camera.height / tilemap->tile_size.y); y++)
 	{
-		for (int x = 0; x < camera.width; x++)
+		for (int x = 0; x < (camera.width / tilemap->tile_size.x); x++)
 		{
 			uint32_t pixel_x = x * tilemap->tile_size.x;
 			uint32_t pixel_y = y * tilemap->tile_size.y;
 			uint32_t pixel_width = x * tilemap->tile_size.x + tilemap->tile_size.x;
 			uint32_t pixel_height = y * tilemap->tile_size.y + tilemap->tile_size.y;
 
-			if (tilemap->tiles[(y + camera.offset_y) * tilemap->width + (x + camera.offset_x)])
+			if (tilemap->tiles[(y + camera.offset_y / tilemap->tile_size.y) * tilemap->width + (x + camera.offset_x / tilemap->tile_size.y)])
 				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 1.0f, 0.0f, 0.0f });
 			else
 				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 0.0f, 0.0f, 1.0f });
