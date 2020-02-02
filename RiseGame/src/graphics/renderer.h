@@ -6,7 +6,13 @@
 #include "bitmap_graphics.h"
 #include "../math/math.h"
 #include "../ecs/entity.h"
+#include "../utils/file_io.h"
 
+
+struct Texture
+{
+	void* data;
+};
 
 struct RenderResource
 {
@@ -30,6 +36,18 @@ struct Tilemap
 	vec2 tile_size;	// in pixels
 };
 
+
+static Texture load_bmp_file(char* filepath)
+{
+	void* file_contents = debug_platform_read_file(filepath);
+	if (file_contents)
+		close_file(file_contents);
+	else
+		return { 0 };
+
+	Texture texture;
+
+}
 
 static void link_camera(Camera* camera, Entity entity, Tilemap* tilemap)
 {

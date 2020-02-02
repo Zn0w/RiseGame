@@ -68,6 +68,10 @@ void game_init()
 
 	// init the game entities and subsystems
 
+	// load assets
+	char player_texture_path[] = "test/assets/hero.bmp";
+	load_bmp_file(player_texture_path);
+
 	player.position = tiles_to_pixels(15, 8);
 
 	player.size = tiles_to_pixels(1, 1);
