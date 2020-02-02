@@ -53,9 +53,9 @@ static void link_camera(Camera* camera, Entity entity, Tilemap tilemap)
 static void render_tilemap(Tilemap* tilemap, BitmapBuffer* graphics_buffer, Camera camera, RenderResource* render_resources)
 {
 	// draw tilemap
-	for (int y = 0; y < (camera.height / tilemap->tile_size.y); y++)
+	for (int y = 0; y <= (camera.height / tilemap->tile_size.y); y++)
 	{
-		for (int x = 0; x < (camera.width / tilemap->tile_size.x); x++)
+		for (int x = 0; x <= (camera.width / tilemap->tile_size.x); x++)
 		{
 			/*uint32_t pixel_x = x * tilemap->tile_size.x;
 			uint32_t pixel_y = y * tilemap->tile_size.y;
@@ -67,9 +67,13 @@ static void render_tilemap(Tilemap* tilemap, BitmapBuffer* graphics_buffer, Came
 			else
 				render_rectangle(graphics_buffer, pixel_x, pixel_y, pixel_width, pixel_height, { 0.0f, 0.0f, 1.0f });*/
 
-			uint32_t pixel_x = camera.offset_x + x * tilemap->tile_size.x;
-			uint32_t pixel_y = camera.offset_y + y * tilemap->tile_size.y;
+			//uint32_t pixel_x = camera.offset_x + x * tilemap->tile_size.x;
+			//uint32_t pixel_y = camera.offset_y + y * tilemap->tile_size.y;
 			
+			uint32_t mempos = (y + camera.offset_y / tilemap->tile_size.y) * tilemap->width + (x + camera.offset_x / tilemap->tile_size.x);
+			uint32_t pixel_x = (mempos % tilemap->width) * tilemap->tile_size.x;
+			uint32_t pixel_y = (mempos / tilemap->width) * tilemap->tile_size.y;
+
 			int32_t relative_position_x = pixel_x - camera.offset_x;
 			int32_t relative_position_y = pixel_y - camera.offset_y;
 
@@ -79,7 +83,7 @@ static void render_tilemap(Tilemap* tilemap, BitmapBuffer* graphics_buffer, Came
 				relative_position_y,
 				relative_position_x + tilemap->tile_size.x,
 				relative_position_y + tilemap->tile_size.y,
-				render_resources[tilemap->tiles[(y + camera.offset_y / tilemap->tile_size.y) * tilemap->width + (x + camera.offset_x / tilemap->tile_size.y)]].color
+				render_resources[tilemap->tiles[(y + camera.offset_y / tilemap->tile_size.y) * tilemap->width + (x + camera.offset_x / tilemap->tile_size.x)]].color
 			);
 		}
 	}
