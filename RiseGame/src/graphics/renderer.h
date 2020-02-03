@@ -9,13 +9,9 @@
 #include "../utils/file_io.h"
 
 
-struct Texture
-{
-	void* data;
-};
-
 struct RenderResource
 {
+	Texture texture;
 	RGBColor color;	// there will also be texture in the future (and you'd be able to apply both color and texture)
 	uint32_t id;	// depending on further implementation (storage of renderables), this may not be needed
 };
@@ -36,18 +32,6 @@ struct Tilemap
 	vec2 tile_size;	// in pixels
 };
 
-
-static Texture load_bmp_file(char* filepath)
-{
-	void* file_contents = debug_platform_read_file(filepath);
-	if (file_contents)
-		close_file(file_contents);
-	else
-		return { 0 };
-
-	Texture texture;
-
-}
 
 static void link_camera(Camera* camera, Entity entity, Tilemap* tilemap)
 {

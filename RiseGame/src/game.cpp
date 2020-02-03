@@ -3,7 +3,10 @@
 #include "utils/file_io.h"
 
 
-RenderResource render_resources[4] = { { { 1.0f, 1.0f, 0.0f }, 0 }, { { 1.0f, 0.0f, 1.0f }, 1 }, { { 0.2f, 0.2f, 0.8f }, 2}, {{0.2f, 0.8f, 0.4f}, 3} };
+RenderResource render_resources[5] = {
+	{ 0, { 1.0f, 1.0f, 0.0f }, 0 }, { 0, { 1.0f, 0.0f, 1.0f }, 1 }, { 0, { 0.2f, 0.2f, 0.8f }, 2}, { 0, {0.2f, 0.8f, 0.4f}, 3},
+	{ 0, { 1.0f, 1.0f, 0.0f }, 4 }
+};
 
 // tile map
 const uint32_t map_width = 64, map_height = 32;
@@ -69,8 +72,10 @@ void game_init()
 	// init the game entities and subsystems
 
 	// load assets
-	char player_texture_path[] = "test/assets/hero.bmp";
-	load_bmp_file(player_texture_path);
+	char player_texture_path[] = "test/assets/hero_3.bmp";
+	Texture player_texture = load_bmp_texture(player_texture_path);
+	render_resources[4].texture = player_texture;
+	
 
 	player.position = tiles_to_pixels(15, 8);
 
@@ -165,6 +170,11 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	render_entity(graphics_buffer, player, camera, render_resources[player.render_id]);
 
 	render_entity(graphics_buffer, test_zombie, camera, render_resources[test_zombie.render_id]);
+
+	// test texture render
+	//char texture_path[] = "test/assets/hero_3.bmp";
+	//Texture test_texture = load_bmp_texture(texture_path);
+	render_sprite(graphics_buffer, 100, 100, 164, 164, render_resources[4].texture);
 }
 
 void game_destroy()
