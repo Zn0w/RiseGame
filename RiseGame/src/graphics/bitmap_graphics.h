@@ -95,6 +95,17 @@ static Texture load_bmp_texture(char* filepath)
 			int32_t Height;          /* Image height in pixels */
 			uint16_t Planes;          /* Number of color planes */
 			uint16_t BitsPerPixel;    /* Number of bits per pixel */
+
+			uint32_t compression;
+			uint32_t size_of_bitmap;
+			int32_t horz_resolution;
+			int32_t vert_resolution;
+			uint32_t colors_used;
+			uint32_t colors_important;
+
+			uint32_t red_mask;
+			uint32_t green_mask;
+			uint32_t blue_mask;
 		};
 #pragma pack(pop)	// revert to the default
 
@@ -102,6 +113,25 @@ static Texture load_bmp_texture(char* filepath)
 		uint32_t* pixels = (uint32_t*)((uint8_t*)file_contents + bmp->BitmapOffset);
 
 		Texture texture = { pixels };
+		
+		// set byte order in memory according to the file header
+		int32_t red_shift = 0;
+		int32_t green_shift = 0;
+		int32_t blue_shift = 0;
+		int32_t alpha_shift = ~(bmp->red_mask | bmp->green_mask | bmp->blue_mask);
+		
+		for (int y = 0; y < bmp->Height; y++)
+		{
+			for (int x = 0; x < bmp->Width; x++)
+			{
+				*pixels =	(((*pixels >> alpha_shift) & 0xFF) << 24) |
+							(((*pixels >> red_shift) & 0xFF) << 16) |
+							(((*pixels >> green_shift) & 0xFF) << 8) |
+							(((*pixels >> blue_shift) & 0xFF) << 0);
+				pixels++;
+			}
+		}
+		
 		return texture;
 
 		// TODO : DO THAT WHEN RENDER RESOURCE IS NOT NEEDED ANYMORE
@@ -130,7 +160,7 @@ static void render_sprite(BitmapBuffer* buffer, int32_t min_x, int32_t min_y, in
 	int32_t pixel_height = max_y - min_y;
 
 	uint32_t* source_row = texture.data + pixel_width * (pixel_height - 1);
-	uint8_t* dest_row = (uint8_t*)buffer->memory;
+	uint8_t* dest_row = (uint8_t*)buffer->memory + min_x * bytes_per_pixel + min_y * buffer->pitch;
 
 	for (int y = min_y; y < max_y; y++)
 	{
