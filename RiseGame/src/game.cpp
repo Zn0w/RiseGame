@@ -52,10 +52,13 @@ const uint32_t visible_tiles_y = 9;
 Tilemap tilemap = { map, map_width, map_height, {screen_width / visible_tiles_x, screen_height / visible_tiles_y } };
 
 
-//const uint32_t camera_scale_x = map_width / visible_tiles_x;
-//const uint32_t camera_scale_y = map_height / visible_tiles_y;
-
 Camera camera;
+
+
+// Game entities
+static Entity player;
+static Entity test_zombie;
+static std::vector<Entity> bullets;
 
 
 static vec2 tiles_to_pixels(int32_t x, int32_t y)
@@ -99,7 +102,7 @@ void game_init()
 	link_camera(&camera, player, &tilemap);
 }
 
-void updatePlayer()
+static void updatePlayer()
 {
 	add(&player.position, player.velocity);
 	
@@ -146,19 +149,31 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 #endif
 
 
+	// Get player input
 	const int32_t player_speed = 10;
-	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
+	if (game_input->keyboard.keys[RG_W].is_down && !game_input->keyboard.keys[RG_W].was_down)
 		player.velocity.y += -player_speed;
-	else if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
+	else if (game_input->keyboard.keys[RG_S].is_down && !game_input->keyboard.keys[RG_S].was_down)
 		player.velocity.y += player_speed;
 
-	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
+	if (game_input->keyboard.keys[RG_A].is_down && !game_input->keyboard.keys[RG_A].was_down)
 		player.velocity.x += -player_speed;
-	else if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
+	else if (game_input->keyboard.keys[RG_D].is_down && !game_input->keyboard.keys[RG_D].was_down)
 		player.velocity.x += player_speed;
 
+	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
+		player.velocity.y += -player_speed;
+	if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
+		player.velocity.y += player_speed;
+	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
+		player.velocity.x += -player_speed;
+	if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
+		player.velocity.x += player_speed;
+
+	// Game update
 	updatePlayer();
 	updateZombie(&test_zombie.position, player.position, test_zombie.velocity);
+
 
 	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
 	link_camera(&camera, player, &tilemap);
