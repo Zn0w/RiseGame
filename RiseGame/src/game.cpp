@@ -3,14 +3,10 @@
 #include "utils/file_io.h"
 
 
-RenderResource render_resources[6] = {
-	{ {}, { 1.0f, 1.0f, 0.0f }, 0 }, { {}, { 1.0f, 0.0f, 1.0f }, 1 }, { {}, { 0.2f, 0.2f, 0.8f }, 2}, { {}, {0.2f, 0.8f, 0.4f}, 3},
-	{ {}, { 1.0f, 1.0f, 0.0f }, 4 }, { {} ,{ 0.8f, 0.3f, 0.0f }, 5 }
-};
+// constants for the test gameplay
 
-// tile map
+// tile map constants
 const uint32_t map_width = 64, map_height = 32;
-
 uint32_t map[map_height * map_width] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -46,33 +42,33 @@ uint32_t map[map_height * map_width] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
+// camera constants
 const uint32_t visible_tiles_x = 16;
 const uint32_t visible_tiles_y = 9;
 
-Tilemap tilemap = { map, map_width, map_height, {screen_width / visible_tiles_x, screen_height / visible_tiles_y } };
+// game mechanics characteristics
+const int32_t PLAYER_SPEED = 10;
+const int32_t PLAYER_RELOAD_DURATION = 10;
+const int32_t MAX_BULLET_DISTANCE = 50;
+const vec2 BULLET_SIZE = { 10, 10 };
 
+
+Tilemap tilemap = { map, map_width, map_height, {screen_width / visible_tiles_x, screen_height / visible_tiles_y } };
 
 Camera camera;
 
 
-// Game entities
-static Player player;
-static Entity test_zombie;
-static std::vector<Bullet*> bullets;
-int8_t pause = 0;
-
-
 static void create_bullet(vec2 position, vec2 velocity)
 {
-	player.reload = 10;
+	game_state.player.reload = PLAYER_RELOAD_DURATION;
 	Bullet* bullet = new Bullet;
 	bullet->position = position;
-	bullet->distance = 50;
+	bullet->distance = MAX_BULLET_DISTANCE;
 	bullet->distance_left = bullet->distance;
 	bullet->render_id = 5;
-	bullet->size = { 10, 10 };
+	bullet->size = BULLET_SIZE;
 	bullet->velocity = velocity;
-	bullets.push_back(bullet);
+	game_state.bullets.push_back(bullet);
 }
 
 static vec2 tiles_to_pixels(int32_t x, int32_t y)
@@ -91,47 +87,48 @@ void game_init()
 	// load assets
 	char player_texture_path[] = "test/assets/hero_4.bmp";
 	Texture player_texture = load_bmp_texture(player_texture_path);
-	render_resources[4].texture = player_texture;
+	game_state.render_resources[4].texture = player_texture;
 	
 
-	player.position = tiles_to_pixels(15, 8);
+	game_state.player.position = tiles_to_pixels(15, 8);
 
-	player.size = tiles_to_pixels(1, 1);
-	//player.size = { 64, 64 };
+	game_state.player.size = tiles_to_pixels(1, 1);
 
-	player.render_id = 2;
+	game_state.player.render_id = 2;
 
 
-	test_zombie.position.x = 0;
-	test_zombie.position.y = 500;
+	game_state.test_zombie.position.x = 0;
+	game_state.test_zombie.position.y = 500;
 
-	test_zombie.size.x = 50;
-	test_zombie.size.y = 50;
+	game_state.test_zombie.size.x = 50;
+	game_state.test_zombie.size.y = 50;
 
-	test_zombie.velocity = {3, 3};
+	game_state.test_zombie.velocity = {3, 3};
 
-	test_zombie.render_id = 3;
+	game_state.test_zombie.render_id = 3;
 
 	camera.width = visible_tiles_x * tilemap.tile_size.x;
 	camera.height = visible_tiles_y * tilemap.tile_size.y;
-	link_camera(&camera, player, &tilemap);
+	link_camera(&camera, game_state.player, &tilemap);
 }
 
 static void updatePlayer()
 {
-	add(&player.position, player.velocity);
+	add(&game_state.player.position, game_state.player.velocity);
 	
-	player.velocity = {0, 0};
+	game_state.player.velocity = {0, 0};
 
-	if (player.reload)
-		player.reload--;
+	if (game_state.player.reload)
+		game_state.player.reload--;
 
-	if (collides(player, test_zombie))
-		pause = 10;
+	if (collides(game_state.player, game_state.test_zombie))
+		game_state.pause = 10;
 }
 
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
 {
+#define MEMORY_TEST 0
+#if MEMORY_TEST == 1
 	assert(sizeof(GameState) <= memory->permanent_storage_size);
 	
 	GameState* game_state = (GameState*)memory->permanent_storage;
@@ -142,6 +139,7 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 
 		memory->is_initialized = true;
 	}
+#endif
 
 #define FILE_IO_TEST 0
 #if FILE_IO_TEST == 1
@@ -171,75 +169,74 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 
 
 	// Get player input
-	const int32_t player_speed = 10;
 	if (game_input->keyboard.keys[RG_W].is_down && !game_input->keyboard.keys[RG_W].was_down)
-		player.velocity.y += -player_speed;
+		game_state.player.velocity.y += -PLAYER_SPEED;
 	else if (game_input->keyboard.keys[RG_S].is_down && !game_input->keyboard.keys[RG_S].was_down)
-		player.velocity.y += player_speed;
+		game_state.player.velocity.y += PLAYER_SPEED;
 
 	if (game_input->keyboard.keys[RG_A].is_down && !game_input->keyboard.keys[RG_A].was_down)
-		player.velocity.x += -player_speed;
+		game_state.player.velocity.x += -PLAYER_SPEED;
 	else if (game_input->keyboard.keys[RG_D].is_down && !game_input->keyboard.keys[RG_D].was_down)
-		player.velocity.x += player_speed;
+		game_state.player.velocity.x += PLAYER_SPEED;
 
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
 	{
-		if (player.reload == 0)
-			create_bullet(player.position, { 0, -15 });
+		if (game_state.player.reload == 0)
+			create_bullet(game_state.player.position, { 0, -15 });
 	}
 	if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
-		if (player.reload == 0)
-			create_bullet(player.position, { 0, 15 });
+		if (game_state.player.reload == 0)
+			create_bullet(game_state.player.position, { 0, 15 });
 	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
-		if (player.reload == 0)
-			create_bullet(player.position, { -15, 0 });
+		if (game_state.player.reload == 0)
+			create_bullet(game_state.player.position, { -15, 0 });
 	if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
-		if (player.reload == 0)
-			create_bullet(player.position, { 15, 0 });
+		if (game_state.player.reload == 0)
+			create_bullet(game_state.player.position, { 15, 0 });
 
 	// Game update
 	updatePlayer();
-	updateZombie(&test_zombie.position, player.position, test_zombie.velocity);
+	updateZombie(&game_state.test_zombie.position, game_state.player.position, game_state.test_zombie.velocity);
 
-	for (int i = 0; i < bullets.size(); i++)
+	for (int i = 0; i < game_state.bullets.size(); i++)
 	{
-		Bullet* bullet = bullets.at(i);
+		Bullet* bullet = game_state.bullets.at(i);
 		update_bullet(bullet);
 		if (bullet->distance_left == 0)
 		{
 			delete bullet;
-			bullets.erase(bullets.begin() + i);
+			game_state.bullets.erase(game_state.bullets.begin() + i);
 		}
 	}
 
 
 	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
-	link_camera(&camera, player, &tilemap);
+	link_camera(&camera, game_state.player, &tilemap);
 
 	// render game entities
 
-	render_tilemap(graphics_buffer, &tilemap, camera, render_resources);
+	render_tilemap(graphics_buffer, &tilemap, camera, game_state.render_resources);
 
-	render_entity(graphics_buffer, player, camera, render_resources[player.render_id]);
+	render_entity(graphics_buffer, game_state.player, camera, game_state.render_resources[game_state.player.render_id]);
 	//render_entity(graphics_buffer, player, camera, render_resources[4].texture);
 
-	render_entity(graphics_buffer, test_zombie, camera, render_resources[test_zombie.render_id]);
+	render_entity(graphics_buffer, game_state.test_zombie, camera, game_state.render_resources[game_state.test_zombie.render_id]);
 
-	for (Bullet* bullet : bullets)
+	for (Bullet* bullet : game_state.bullets)
 	{
-		render_entity(graphics_buffer, *bullet, camera, render_resources[bullet->render_id]);
+		render_entity(graphics_buffer, *bullet, camera, game_state.render_resources[bullet->render_id]);
 	}
 
-	if (pause)
+	if (game_state.pause)
 	{
 		render_rectangle(graphics_buffer, 0, 0, screen_width, screen_height, {1.0f, 0.0f, 0.0f});
-		pause--;
+		game_state.pause--;
 	}
 
 	// test texture render
 	//char texture_path[] = "test/assets/hero_3.bmp";
 	//Texture test_texture = load_bmp_texture(texture_path);
-	render_sprite(graphics_buffer, 100, 100, 164, 164, render_resources[4].texture);
+	render_sprite(graphics_buffer, 100, 100, 164, 164, game_state.render_resources[4].texture);
 }
 
 void game_destroy()

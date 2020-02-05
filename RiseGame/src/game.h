@@ -18,11 +18,24 @@ static int screen_width = 1600;
 static int screen_height = 900;
 
 
+// FOR NOW THE GAME STATE WILL BE STORED IN HERE (STACK) AND ON THE HEAP (WITH new AND delete),
+// BUT IT WILL BE STORED USING CUSTOM struct GameMemory
 struct GameState
 {
-	int16_t sample_volume;
-	int sample_hz;
+	//int16_t sample_volume;
+	//int sample_hz;
+
+	Player player;
+	Entity test_zombie;
+	std::vector<Bullet*> bullets;
+	int8_t pause = 0;
+	
+	RenderResource render_resources[6] = {
+		{ {},{ 1.0f, 1.0f, 0.0f }, 0 },{ {},{ 1.0f, 0.0f, 1.0f }, 1 },{ {},{ 0.2f, 0.2f, 0.8f }, 2 },{ {},{ 0.2f, 0.8f, 0.4f }, 3 },
+		{ {},{ 1.0f, 1.0f, 0.0f }, 4 },{ {} ,{ 0.8f, 0.3f, 0.0f }, 5 }
+	};
 };
+static GameState game_state;
 
 
 void game_init();
