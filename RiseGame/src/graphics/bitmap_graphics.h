@@ -24,6 +24,7 @@ struct RGBColor
 struct Texture
 {
 	uint32_t* data;
+	uint32_t width, height;
 };
 
 
@@ -127,7 +128,9 @@ static Texture load_bmp_texture(char* filepath)
 		bmp_file_header* bmp = (bmp_file_header*)file_contents;
 		uint32_t* pixels = (uint32_t*)((uint8_t*)file_contents + bmp->BitmapOffset);
 
-		Texture texture = { pixels };
+		Texture texture = { pixels, bmp->Width, bmp->Height };
+		
+		assert(bmp->compression == 3);
 		
 		// set byte order in memory according to the file header
 		
@@ -172,11 +175,19 @@ static Texture load_bmp_texture(char* filepath)
 
 static void render_sprite(BitmapBuffer* buffer, int32_t min_x, int32_t min_y, int32_t max_x, int32_t max_y, Texture texture)
 {
+	int32_t source_offset_x = 0;
 	if (min_x < 0)
+	{
+		source_offset_x = -min_x;
 		min_x = 0;
+	}
 
+	int32_t source_offset_y = 0;
 	if (min_y < 0)
+	{
+		source_offset_y = -min_y;
 		min_y = 0;
+	}
 
 	if (max_x > buffer->width)
 		max_x = buffer->width;
@@ -184,10 +195,9 @@ static void render_sprite(BitmapBuffer* buffer, int32_t min_x, int32_t min_y, in
 	if (max_y > buffer->height)
 		max_y = buffer->height;
 
-	int32_t pixel_width = max_x - min_x;
-	int32_t pixel_height = max_y - min_y;
 
-	uint32_t* source_row = texture.data + pixel_width * (pixel_height - 1);
+	uint32_t* source_row = texture.data + texture.width * (texture.height - 1);
+	source_row += -source_offset_y * texture.width + source_offset_x;	// adjust to clipping
 	uint8_t* dest_row = (uint8_t*)buffer->memory + min_x * bytes_per_pixel + min_y * buffer->pitch;
 
 	for (int y = min_y; y < max_y; y++)
@@ -197,10 +207,15 @@ static void render_sprite(BitmapBuffer* buffer, int32_t min_x, int32_t min_y, in
 		
 		for (int x = min_x; x < max_x; x++)
 		{
-			*dest++ = *source++;
+			// consider alpha channel (simple version)
+			if ((*source >> 24) > 128)
+				*dest = *source;
+
+			dest++;
+			source++;
 		}
 
 		dest_row += buffer->pitch;
-		source_row -= pixel_width;
+		source_row -= texture.width;
 	}
 }

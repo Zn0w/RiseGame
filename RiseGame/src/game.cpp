@@ -4,8 +4,8 @@
 
 
 RenderResource render_resources[6] = {
-	{ 0, { 1.0f, 1.0f, 0.0f }, 0 }, { 0, { 1.0f, 0.0f, 1.0f }, 1 }, { 0, { 0.2f, 0.2f, 0.8f }, 2}, { 0, {0.2f, 0.8f, 0.4f}, 3},
-	{ 0, { 1.0f, 1.0f, 0.0f }, 4 }, { 0 ,{ 0.8f, 0.3f, 0.0f }, 5 }
+	{ {}, { 1.0f, 1.0f, 0.0f }, 0 }, { {}, { 1.0f, 0.0f, 1.0f }, 1 }, { {}, { 0.2f, 0.2f, 0.8f }, 2}, { {}, {0.2f, 0.8f, 0.4f}, 3},
+	{ {}, { 1.0f, 1.0f, 0.0f }, 4 }, { {} ,{ 0.8f, 0.3f, 0.0f }, 5 }
 };
 
 // tile map
@@ -94,7 +94,8 @@ void game_init()
 
 	player.position = tiles_to_pixels(15, 8);
 
-	player.size = tiles_to_pixels(1, 1);
+	//player.size = tiles_to_pixels(1, 1);
+	player.size = { 64, 64 };
 
 	player.render_id = 2;
 
@@ -200,6 +201,7 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	render_tilemap(graphics_buffer, &tilemap, camera, render_resources);
 
 	render_entity(graphics_buffer, player, camera, render_resources[player.render_id]);
+	render_entity(graphics_buffer, player, camera, render_resources[4].texture);
 
 	render_entity(graphics_buffer, test_zombie, camera, render_resources[test_zombie.render_id]);
 
