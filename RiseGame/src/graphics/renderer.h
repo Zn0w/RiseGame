@@ -105,7 +105,7 @@ static void render_entity(BitmapBuffer* graphics_buffer, Entity entity, Camera c
 	}
 }
 
-static void render_entities(BitmapBuffer* graphics_buffer, std::vector<Entity>* entities, Camera camera, RenderResource* render_resources)
+/*static void render_entities(BitmapBuffer* graphics_buffer, std::vector<Entity>* entities, Camera camera, RenderResource* render_resources)
 {
 	for (Entity entity : *entities)
 	{
@@ -129,4 +129,4 @@ static void render_entities(BitmapBuffer* graphics_buffer, std::vector<Entity>* 
 			);
 		}
 	}
-}
+}*/

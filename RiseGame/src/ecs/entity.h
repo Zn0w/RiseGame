@@ -12,7 +12,7 @@ struct Entity
 };
 
 
-bool collides(Entity e1, Entity e2)
+static bool collides(Entity e1, Entity e2)
 {
 	return	e1.position.x < e2.position.x + e2.size.x &&
 			e1.position.x + e1.size.x > e2.position.x &&

@@ -3,9 +3,9 @@
 #include "utils/file_io.h"
 
 
-RenderResource render_resources[5] = {
+RenderResource render_resources[6] = {
 	{ 0, { 1.0f, 1.0f, 0.0f }, 0 }, { 0, { 1.0f, 0.0f, 1.0f }, 1 }, { 0, { 0.2f, 0.2f, 0.8f }, 2}, { 0, {0.2f, 0.8f, 0.4f}, 3},
-	{ 0, { 1.0f, 1.0f, 0.0f }, 4 }
+	{ 0, { 1.0f, 1.0f, 0.0f }, 4 }, { 0 ,{ 0.8f, 0.3f, 0.0f }, 5 }
 };
 
 // tile map
@@ -58,8 +58,20 @@ Camera camera;
 // Game entities
 static Entity player;
 static Entity test_zombie;
-static std::vector<Entity> bullets;
+static std::vector<Bullet> bullets;
 
+
+static void create_bullet(vec2 position, vec2 velocity)
+{
+	Bullet bullet = {};
+	bullet.position = position;
+	bullet.distance = 10;
+	bullet.distance_left = 10;
+	bullet.render_id = 5;
+	bullet.size = { 10, 10 };
+	bullet.velocity = velocity;
+	bullets.push_back(bullet);
+}
 
 static vec2 tiles_to_pixels(int32_t x, int32_t y)
 {
@@ -75,7 +87,7 @@ void game_init()
 	// init the game entities and subsystems
 
 	// load assets
-	char player_texture_path[] = "test/assets/hero_3.bmp";
+	char player_texture_path[] = "test/assets/hero_4.bmp";
 	Texture player_texture = load_bmp_texture(player_texture_path);
 	render_resources[4].texture = player_texture;
 	
@@ -162,17 +174,22 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		player.velocity.x += player_speed;
 
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
-		player.velocity.y += -player_speed;
+		create_bullet(player.position, { 0, -15 });
 	if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
-		player.velocity.y += player_speed;
+		create_bullet(player.position, { 0, 15 });
 	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
-		player.velocity.x += -player_speed;
+		create_bullet(player.position, { -15, 0 });
 	if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
-		player.velocity.x += player_speed;
+		create_bullet(player.position, { 15, 0 });
 
 	// Game update
 	updatePlayer();
 	updateZombie(&test_zombie.position, player.position, test_zombie.velocity);
+
+	/*for (int i = 0; i < bullets.size();)
+	{
+
+	}*/
 
 
 	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <assert.h>
 
 #include "../math/math.h"
 #include "../utils/file_io.h"
@@ -77,6 +78,20 @@ static void render_rectangle(BitmapBuffer* buffer, int32_t min_x, int32_t min_y,
 	}
 }
 
+static bool find_least_significant_set_bit(uint32_t* index, uint32_t value)
+{
+	for (int i = 0; i < 32; i++)
+	{
+		if (value & (1 << i))
+		{
+			*index = i;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 static Texture load_bmp_texture(char* filepath)
 {
 	void* file_contents = debug_platform_read_file(filepath);
@@ -115,10 +130,23 @@ static Texture load_bmp_texture(char* filepath)
 		Texture texture = { pixels };
 		
 		// set byte order in memory according to the file header
-		int32_t red_shift = 0;
-		int32_t green_shift = 0;
-		int32_t blue_shift = 0;
-		int32_t alpha_shift = ~(bmp->red_mask | bmp->green_mask | bmp->blue_mask);
+		
+		uint32_t alpha_mask = ~(bmp->red_mask | bmp->green_mask | bmp->blue_mask);;
+		
+		uint32_t red_shift = 0;
+		uint32_t green_shift = 0;
+		uint32_t blue_shift = 0;
+		uint32_t alpha_shift = 0;
+
+		bool red_found = find_least_significant_set_bit(&red_shift, bmp->red_mask);
+		bool green_found = find_least_significant_set_bit(&green_shift, bmp->green_mask);
+		bool blue_found = find_least_significant_set_bit(&blue_shift, bmp->blue_mask);
+		bool alpha_found = find_least_significant_set_bit(&alpha_shift, alpha_mask);
+		
+		assert(red_found);
+		assert(green_found);
+		assert(blue_found);
+		assert(alpha_found);
 		
 		for (int y = 0; y < bmp->Height; y++)
 		{
