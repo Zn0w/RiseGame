@@ -128,29 +128,3 @@ static void render_entity(BitmapBuffer* graphics_buffer, Entity entity, Camera c
 		);
 	}
 }
-
-/*static void render_entities(BitmapBuffer* graphics_buffer, std::vector<Entity>* entities, Camera camera, RenderResource* render_resources)
-{
-	for (Entity entity : *entities)
-	{
-		if (
-			entity.position.x < camera.offset_x + camera.width &&
-			entity.position.x + entity.size.x > camera.offset_x &&
-			entity.position.y < camera.offset_y + camera.height &&
-			entity.position.y + entity.size.y > camera.offset_y
-			)
-		{
-			int32_t relative_position_x = entity.position.x - camera.offset_x;
-			int32_t relative_position_y = entity.position.y - camera.offset_y;
-
-			render_rectangle(
-				graphics_buffer,
-				relative_position_x - entity.size.x / 2,
-				relative_position_y - entity.size.y / 2,
-				relative_position_x + entity.size.x / 2,
-				relative_position_y + entity.size.y / 2,
-				render_resources[entity.render_id].color
-			);
-		}
-	}
-}*/

@@ -56,20 +56,22 @@ Camera camera;
 
 
 // Game entities
-static Entity player;
+static Player player;
 static Entity test_zombie;
-static std::vector<Bullet> bullets;
+static std::vector<Bullet*> bullets;
+int8_t pause = 0;
 
 
 static void create_bullet(vec2 position, vec2 velocity)
 {
-	Bullet bullet = {};
-	bullet.position = position;
-	bullet.distance = 10;
-	bullet.distance_left = 10;
-	bullet.render_id = 5;
-	bullet.size = { 10, 10 };
-	bullet.velocity = velocity;
+	player.reload = 10;
+	Bullet* bullet = new Bullet;
+	bullet->position = position;
+	bullet->distance = 50;
+	bullet->distance_left = bullet->distance;
+	bullet->render_id = 5;
+	bullet->size = { 10, 10 };
+	bullet->velocity = velocity;
 	bullets.push_back(bullet);
 }
 
@@ -94,8 +96,8 @@ void game_init()
 
 	player.position = tiles_to_pixels(15, 8);
 
-	//player.size = tiles_to_pixels(1, 1);
-	player.size = { 64, 64 };
+	player.size = tiles_to_pixels(1, 1);
+	//player.size = { 64, 64 };
 
 	player.render_id = 2;
 
@@ -120,6 +122,12 @@ static void updatePlayer()
 	add(&player.position, player.velocity);
 	
 	player.velocity = {0, 0};
+
+	if (player.reload)
+		player.reload--;
+
+	if (collides(player, test_zombie))
+		pause = 10;
 }
 
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
@@ -175,22 +183,34 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		player.velocity.x += player_speed;
 
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
-		create_bullet(player.position, { 0, -15 });
+	{
+		if (player.reload == 0)
+			create_bullet(player.position, { 0, -15 });
+	}
 	if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
-		create_bullet(player.position, { 0, 15 });
+		if (player.reload == 0)
+			create_bullet(player.position, { 0, 15 });
 	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
-		create_bullet(player.position, { -15, 0 });
+		if (player.reload == 0)
+			create_bullet(player.position, { -15, 0 });
 	if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
-		create_bullet(player.position, { 15, 0 });
+		if (player.reload == 0)
+			create_bullet(player.position, { 15, 0 });
 
 	// Game update
 	updatePlayer();
 	updateZombie(&test_zombie.position, player.position, test_zombie.velocity);
 
-	/*for (int i = 0; i < bullets.size();)
+	for (int i = 0; i < bullets.size(); i++)
 	{
-
-	}*/
+		Bullet* bullet = bullets.at(i);
+		update_bullet(bullet);
+		if (bullet->distance_left == 0)
+		{
+			delete bullet;
+			bullets.erase(bullets.begin() + i);
+		}
+	}
 
 
 	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
@@ -201,9 +221,20 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	render_tilemap(graphics_buffer, &tilemap, camera, render_resources);
 
 	render_entity(graphics_buffer, player, camera, render_resources[player.render_id]);
-	render_entity(graphics_buffer, player, camera, render_resources[4].texture);
+	//render_entity(graphics_buffer, player, camera, render_resources[4].texture);
 
 	render_entity(graphics_buffer, test_zombie, camera, render_resources[test_zombie.render_id]);
+
+	for (Bullet* bullet : bullets)
+	{
+		render_entity(graphics_buffer, *bullet, camera, render_resources[bullet->render_id]);
+	}
+
+	if (pause)
+	{
+		render_rectangle(graphics_buffer, 0, 0, screen_width, screen_height, {1.0f, 0.0f, 0.0f});
+		pause--;
+	}
 
 	// test texture render
 	//char texture_path[] = "test/assets/hero_3.bmp";

@@ -6,6 +6,11 @@
 #include "../ecs/entity.h"
 
 
+struct Player : public Entity
+{
+	int8_t reload = 0;
+};
+
 static void updateZombie(vec2* position, vec2 target, vec2 velocity_scalar)
 {
 	if (position->x > target.x)
