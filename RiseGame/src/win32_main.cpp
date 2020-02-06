@@ -224,7 +224,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 			sound_buffer.sample_count = bytes_to_write / sound_output.bytes_per_sample;
 			sound_buffer.samples_buffer = samples;
 
-			game_update_and_render(1.0f, &game_memory, &graphics_buffer, &sound_buffer, &game_input);
+			//game_update_and_render(1.0f, &game_memory, &graphics_buffer, &sound_buffer, &game_input);
 
 			// DirectSound output test (sine wave)
 			if (sound_is_valid)
@@ -256,10 +256,10 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 			int32_t fps = (int32_t)(cpu_frequency.QuadPart / counter_elapsed);
 			
 			char char_buffer[256];
-			wsprintf(char_buffer, "fps: %d\n", fps);
+			sprintf_s(char_buffer, "fps: %d\tms: %.2f\n", fps, elapsed_time);
 			OutputDebugStringA(char_buffer);
 			
-			// TODO : pass delta to the game function and (or) display fps
+			game_update_and_render(elapsed_time, &game_memory, &graphics_buffer, &sound_buffer, &game_input);
 
 			last_cycle_count = end_cycle_count;
 			last_counter = end_counter;

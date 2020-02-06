@@ -46,8 +46,8 @@ uint32_t map[map_height * map_width] = {
 const uint32_t visible_tiles_x = 16;
 const uint32_t visible_tiles_y = 9;
 
-// game mechanics characteristics
-const int32_t PLAYER_SPEED = 10;
+// game mechanics characteristics constants
+const int32_t PLAYER_SPEED = 1;
 const int32_t PLAYER_RELOAD_DURATION = 10;
 const int32_t MAX_BULLET_DISTANCE = 50;
 const vec2 BULLET_SIZE = { 10, 10 };
@@ -170,14 +170,14 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 
 	// Get player input
 	if (game_input->keyboard.keys[RG_W].is_down && !game_input->keyboard.keys[RG_W].was_down)
-		game_state.player.velocity.y += -PLAYER_SPEED;
+		game_state.player.velocity.y += -PLAYER_SPEED * time;
 	else if (game_input->keyboard.keys[RG_S].is_down && !game_input->keyboard.keys[RG_S].was_down)
-		game_state.player.velocity.y += PLAYER_SPEED;
+		game_state.player.velocity.y += PLAYER_SPEED * time;
 
 	if (game_input->keyboard.keys[RG_A].is_down && !game_input->keyboard.keys[RG_A].was_down)
-		game_state.player.velocity.x += -PLAYER_SPEED;
+		game_state.player.velocity.x += -PLAYER_SPEED * time;
 	else if (game_input->keyboard.keys[RG_D].is_down && !game_input->keyboard.keys[RG_D].was_down)
-		game_state.player.velocity.x += PLAYER_SPEED;
+		game_state.player.velocity.x += PLAYER_SPEED * time;
 
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
 	{

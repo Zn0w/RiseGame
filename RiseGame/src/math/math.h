@@ -14,6 +14,11 @@ static void add(vec2* a, vec2 b)
 	a->y += b.y;
 }
 
+static vec2 add(vec2 a, vec2 b)
+{
+	return { a.x + b.x, a.y + b.y };
+}
+
 struct vec3
 {
 	int32_t x, y, z;
