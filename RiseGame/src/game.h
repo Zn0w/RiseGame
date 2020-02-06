@@ -34,6 +34,13 @@ struct GameState
 		{ {},{ 1.0f, 1.0f, 0.0f }, 0 },{ {},{ 1.0f, 0.0f, 1.0f }, 1 },{ {},{ 0.2f, 0.2f, 0.8f }, 2 },{ {},{ 0.2f, 0.8f, 0.4f }, 3 },
 		{ {},{ 1.0f, 1.0f, 0.0f }, 4 },{ {} ,{ 0.8f, 0.3f, 0.0f }, 5 }
 	};
+
+	TileType tile_types[2] = {
+		{0,0,0}, {1,1,0}
+	};
+
+	Tilemap tilemap;
+	Camera camera;
 };
 static GameState game_state;
 

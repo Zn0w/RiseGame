@@ -33,3 +33,8 @@ static void update_bullet(Bullet* bullet)
 	add(&bullet->position, bullet->velocity);
 	bullet->distance_left--;
 }
+
+static void wall_tile_update(Entity* e)
+{
+	
+}

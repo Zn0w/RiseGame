@@ -28,3 +28,10 @@ static bool collides(Entity e1, Entity e2)
 			e1_position_tl.y < e2_position_br.y &&
 			e1_position_br.y > e2_position_tl.y;
 }
+
+struct TileType
+{
+	uint32_t id;
+	uint32_t render_id;
+	void(*update) (Entity*) = 0;
+};

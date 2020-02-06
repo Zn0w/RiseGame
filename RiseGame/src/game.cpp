@@ -53,11 +53,6 @@ const int32_t MAX_BULLET_DISTANCE = 50;
 const vec2 BULLET_SIZE = { 10, 10 };
 
 
-Tilemap tilemap = { map, map_width, map_height, {screen_width / visible_tiles_x, screen_height / visible_tiles_y } };
-
-Camera camera;
-
-
 static void create_bullet(vec2 position, vec2 velocity)
 {
 	game_state.player.reload = PLAYER_RELOAD_DURATION;
@@ -73,7 +68,7 @@ static void create_bullet(vec2 position, vec2 velocity)
 
 static vec2 tiles_to_pixels(int32_t x, int32_t y)
 {
-	return { x * tilemap.tile_size.x, y * tilemap.tile_size.y };
+	return { x * game_state.tilemap.tile_size.x, y * game_state.tilemap.tile_size.y };
 }
 
 
@@ -83,6 +78,8 @@ void game_init()
 	// for now it's hardcoded
 
 	// init the game entities and subsystems
+
+	game_state.tilemap = { map, map_width, map_height,{ screen_width / (int)visible_tiles_x, screen_height / (int)visible_tiles_y } };
 
 	// load assets
 	char player_texture_path[] = "test/assets/hero_4.bmp";
@@ -107,9 +104,11 @@ void game_init()
 
 	game_state.test_zombie.render_id = 3;
 
-	camera.width = visible_tiles_x * tilemap.tile_size.x;
-	camera.height = visible_tiles_y * tilemap.tile_size.y;
-	link_camera(&camera, game_state.player, &tilemap);
+	game_state.camera.width = visible_tiles_x * game_state.tilemap.tile_size.x;
+	game_state.camera.height = visible_tiles_y * game_state.tilemap.tile_size.y;
+	link_camera(&game_state.camera, game_state.player, &game_state.tilemap);
+
+	game_state.tile_types[0].update = &wall_tile_update;
 }
 
 static void updatePlayer()
@@ -209,22 +208,49 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		}
 	}
 
+	// tiles update (only with player for now)
+	for (int y = (game_state.player.position.y - game_state.player.size.y / 2) / game_state.tilemap.tile_size.y; y < map_height && y < (y + 2); y++)
+	{
+		for (int x = (game_state.player.position.x - game_state.player.size.x / 2) / game_state.tilemap.tile_size.x; x < map_width && x < (x + 2); x++)
+		{
+			// if collides
+			vec2 position_tl = add(game_state.player.position, { -game_state.player.size.x / 2, -game_state.player.size.y / 2 });
+			vec2 position_br = add(game_state.player.position, { game_state.player.size.x / 2, game_state.player.size.y / 2 });
+			
+			vec2 tile_pos_tl = {x*game_state.tilemap.tile_size.x, y*game_state.tilemap.tile_size.y};
+			vec2 tile_pos_br = add(tile_pos_tl, { game_state.tilemap.tile_size.x, game_state.tilemap.tile_size.y });
+
+			if (position_tl.x < tile_pos_br.x &&
+				position_br.x > tile_pos_tl.x &&
+				position_tl.y < tile_pos_br.y &&
+				position_br.y > tile_pos_tl.y)
+			{
+				uint32_t mempos = y * game_state.tilemap.width + x;
+				
+				if (game_state.tile_types[game_state.tilemap.tiles[mempos]].update)
+					game_state.tile_types[game_state.tilemap.tiles[mempos]].update(&game_state.player);
+				
+				game_state.tilemap.tiles[mempos] = 1;	// leave a purple trail (test)
+			}
+		}
+	}
+
 
 	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
-	link_camera(&camera, game_state.player, &tilemap);
+	link_camera(&game_state.camera, game_state.player, &game_state.tilemap);
 
 	// render game entities
 
-	render_tilemap(graphics_buffer, &tilemap, camera, game_state.render_resources);
+	render_tilemap(graphics_buffer, &game_state.tilemap, game_state.camera, game_state.render_resources);
 
-	render_entity(graphics_buffer, game_state.player, camera, game_state.render_resources[game_state.player.render_id]);
+	render_entity(graphics_buffer, game_state.player, game_state.camera, game_state.render_resources[game_state.player.render_id]);
 	//render_entity(graphics_buffer, player, camera, render_resources[4].texture);
 
-	render_entity(graphics_buffer, game_state.test_zombie, camera, game_state.render_resources[game_state.test_zombie.render_id]);
+	render_entity(graphics_buffer, game_state.test_zombie, game_state.camera, game_state.render_resources[game_state.test_zombie.render_id]);
 
 	for (Bullet* bullet : game_state.bullets)
 	{
-		render_entity(graphics_buffer, *bullet, camera, game_state.render_resources[bullet->render_id]);
+		render_entity(graphics_buffer, *bullet, game_state.camera, game_state.render_resources[bullet->render_id]);
 	}
 
 	if (game_state.pause)
