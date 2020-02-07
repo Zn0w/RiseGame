@@ -46,12 +46,6 @@ uint32_t map[map_height * map_width] = {
 const uint32_t visible_tiles_x = 16;
 const uint32_t visible_tiles_y = 9;
 
-// game mechanics characteristics constants
-const int32_t PLAYER_SPEED = 1;
-const int32_t PLAYER_RELOAD_DURATION = 10;
-const int32_t MAX_BULLET_DISTANCE = 50;
-const vec2 BULLET_SIZE = { 10, 10 };
-
 
 static void create_bullet(vec2 position, vec2 velocity)
 {
@@ -108,7 +102,7 @@ void game_init()
 	game_state.camera.height = visible_tiles_y * game_state.tilemap.tile_size.y;
 	link_camera(&game_state.camera, game_state.player, &game_state.tilemap);
 
-	game_state.tile_types[0].update = &wall_tile_update;
+	game_state.tile_types[1].update = &wall_tile_update;
 }
 
 static void updatePlayer()
@@ -169,14 +163,14 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 
 	// Get player input
 	if (game_input->keyboard.keys[RG_W].is_down && !game_input->keyboard.keys[RG_W].was_down)
-		game_state.player.velocity.y += -PLAYER_SPEED * time;
+		game_state.player.velocity.y += -game_state.player.speed * time;
 	else if (game_input->keyboard.keys[RG_S].is_down && !game_input->keyboard.keys[RG_S].was_down)
-		game_state.player.velocity.y += PLAYER_SPEED * time;
+		game_state.player.velocity.y += game_state.player.speed * time;
 
 	if (game_input->keyboard.keys[RG_A].is_down && !game_input->keyboard.keys[RG_A].was_down)
-		game_state.player.velocity.x += -PLAYER_SPEED * time;
+		game_state.player.velocity.x += -game_state.player.speed * time;
 	else if (game_input->keyboard.keys[RG_D].is_down && !game_input->keyboard.keys[RG_D].was_down)
-		game_state.player.velocity.x += PLAYER_SPEED * time;
+		game_state.player.velocity.x += game_state.player.speed * time;
 
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
 	{
@@ -194,20 +188,6 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 			create_bullet(game_state.player.position, { 15, 0 });
 
 	// Game update
-	updatePlayer();
-	updateZombie(&game_state.test_zombie.position, game_state.player.position, game_state.test_zombie.velocity);
-
-	for (int i = 0; i < game_state.bullets.size(); i++)
-	{
-		Bullet* bullet = game_state.bullets.at(i);
-		update_bullet(bullet);
-		if (bullet->distance_left == 0)
-		{
-			delete bullet;
-			game_state.bullets.erase(game_state.bullets.begin() + i);
-		}
-	}
-
 	// tiles update (only with player for now)
 	for (int y = (game_state.player.position.y - game_state.player.size.y / 2) / game_state.tilemap.tile_size.y; y < map_height && y < (y + 2); y++)
 	{
@@ -220,18 +200,29 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 			vec2 tile_pos_tl = {x*game_state.tilemap.tile_size.x, y*game_state.tilemap.tile_size.y};
 			vec2 tile_pos_br = add(tile_pos_tl, { game_state.tilemap.tile_size.x, game_state.tilemap.tile_size.y });
 
-			if (position_tl.x < tile_pos_br.x &&
-				position_br.x > tile_pos_tl.x &&
-				position_tl.y < tile_pos_br.y &&
-				position_br.y > tile_pos_tl.y)
+			if (collides(position_tl, position_br, tile_pos_tl, tile_pos_br))
 			{
 				uint32_t mempos = y * game_state.tilemap.width + x;
 				
 				if (game_state.tile_types[game_state.tilemap.tiles[mempos]].update)
-					game_state.tile_types[game_state.tilemap.tiles[mempos]].update(&game_state.player);
+					game_state.tile_types[game_state.tilemap.tiles[mempos]].update(&game_state.player, tile_pos_tl, tile_pos_br);
 				
-				game_state.tilemap.tiles[mempos] = 1;	// leave a purple trail (test)
+				//game_state.tilemap.tiles[mempos] = 1;	// leave a purple trail (test)
 			}
+		}
+	}
+
+	updatePlayer();
+	updateZombie(&game_state.test_zombie.position, game_state.player.position, game_state.test_zombie.velocity);
+
+	for (int i = 0; i < game_state.bullets.size(); i++)
+	{
+		Bullet* bullet = game_state.bullets.at(i);
+		update_bullet(bullet);
+		if (bullet->distance_left == 0)
+		{
+			delete bullet;
+			game_state.bullets.erase(game_state.bullets.begin() + i);
 		}
 	}
 
