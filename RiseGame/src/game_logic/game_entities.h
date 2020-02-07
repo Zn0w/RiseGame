@@ -19,14 +19,25 @@ struct Player : public Entity
 	const int8_t speed = PLAYER_SPEED;
 };
 
-static void updateZombie(vec2* position, vec2 target, vec2 velocity_scalar)
+struct Zombie : public Entity
 {
-	if (position->x > target.x)
-		velocity_scalar.x *= -1;
-	if (position->y > target.y)
-		velocity_scalar.y *= -1;
+	int8_t hp = 10;
+	int8_t speed = 1;
+};
 
-	add(position, velocity_scalar);
+static void updateZombie(float time, Zombie* zombie, vec2 target)
+{
+	if (zombie->position.x > target.x)
+		zombie->velocity.x = -zombie->speed;
+	else
+		zombie->velocity.x = zombie->speed;
+
+	if (zombie->position.y > target.y)
+		zombie->velocity.y = -zombie->speed;
+	else
+		zombie->velocity.y = zombie->speed;
+
+	add(&zombie->position, zombie->velocity);
 }
 
 
@@ -36,7 +47,7 @@ struct Bullet : public Entity
 	int8_t distance_left;
 };
 
-static void update_bullet(Bullet* bullet)
+static void update_bullet(float time, Bullet* bullet)
 {
 	add(&bullet->position, bullet->velocity);
 	bullet->distance_left--;
@@ -44,7 +55,6 @@ static void update_bullet(Bullet* bullet)
 
 static void wall_tile_update(Entity* e, vec2 tile_tl, vec2 tile_br)
 {
-	//add(&e->position, { -2 * e->velocity.x, -2 * e->velocity.y });
 	vec2 e_tl = add(e->position, { -e->size.x / 2, -e->size.y / 2 });
 	vec2 e_br = add(e->position, { e->size.x / 2, e->size.y / 2 });
 	

@@ -26,7 +26,7 @@ struct GameState
 	//int sample_hz;
 
 	Player player;
-	Entity test_zombie;
+	std::vector<Zombie*> zombies;
 	std::vector<Bullet*> bullets;
 	int8_t pause = 0;
 	

@@ -21,7 +21,7 @@ uint32_t map[map_height * map_width] = {
 	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 	1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+	1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 	1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -60,6 +60,16 @@ static void create_bullet(vec2 position, vec2 velocity)
 	game_state.bullets.push_back(bullet);
 }
 
+static void create_zombie(vec2 position)
+{
+	Zombie* zombie = new Zombie;
+	zombie->velocity = {zombie->speed, zombie->speed};
+	zombie->size = { 50, 50 };
+	zombie->render_id = 3;
+	zombie->position = position;
+	game_state.zombies.push_back(zombie);
+}
+
 static vec2 tiles_to_pixels(int32_t x, int32_t y)
 {
 	return { x * game_state.tilemap.tile_size.x, y * game_state.tilemap.tile_size.y };
@@ -88,15 +98,9 @@ void game_init()
 	game_state.player.render_id = 2;
 
 
-	game_state.test_zombie.position.x = 0;
-	game_state.test_zombie.position.y = 500;
-
-	game_state.test_zombie.size.x = 50;
-	game_state.test_zombie.size.y = 50;
-
-	game_state.test_zombie.velocity = {3, 3};
-
-	game_state.test_zombie.render_id = 3;
+	create_zombie({ 1000, 500 });
+	create_zombie({ 2000, 800 });
+	create_zombie({ 2500, 300 });
 
 	game_state.camera.width = visible_tiles_x * game_state.tilemap.tile_size.x;
 	game_state.camera.height = visible_tiles_y * game_state.tilemap.tile_size.y;
@@ -105,7 +109,7 @@ void game_init()
 	game_state.tile_types[1].update = &wall_tile_update;
 }
 
-static void updatePlayer()
+static void updatePlayer(float time)
 {
 	add(&game_state.player.position, game_state.player.velocity);
 	
@@ -114,8 +118,12 @@ static void updatePlayer()
 	if (game_state.player.reload)
 		game_state.player.reload--;
 
-	if (collides(game_state.player, game_state.test_zombie))
-		game_state.pause = 10;
+	// slow collision test for zombies (for the test gameplay)
+	for (Zombie* zombie : game_state.zombies)
+	{
+		if (collides(game_state.player, *zombie))
+			game_state.pause = 10;
+	}
 }
 
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
@@ -212,13 +220,31 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		}
 	}
 
-	updatePlayer();
-	updateZombie(&game_state.test_zombie.position, game_state.player.position, game_state.test_zombie.velocity);
+	updatePlayer(time);
+	//updateZombie(time, &game_state.test_zombie.position, game_state.player.position, game_state.test_zombie.velocity);
+	for (int i = 0; i < game_state.zombies.size(); i++)
+	{
+		Zombie* zombie = game_state.zombies.at(i);
+		updateZombie(time, zombie, game_state.player.position);
+		
+		// slow collision test for bullets (for the test gameplay)
+		for (Bullet* bullet : game_state.bullets)
+		{
+			if (collides(*zombie, *bullet))
+				zombie->hp--;
+		}
+
+		if (zombie->hp <= 0)
+		{
+			delete zombie;
+			game_state.zombies.erase(game_state.zombies.begin() + i);
+		}
+	}
 
 	for (int i = 0; i < game_state.bullets.size(); i++)
 	{
 		Bullet* bullet = game_state.bullets.at(i);
-		update_bullet(bullet);
+		update_bullet(time, bullet);
 		if (bullet->distance_left == 0)
 		{
 			delete bullet;
@@ -237,7 +263,10 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	render_entity(graphics_buffer, game_state.player, game_state.camera, game_state.render_resources[game_state.player.render_id]);
 	//render_entity(graphics_buffer, player, camera, render_resources[4].texture);
 
-	render_entity(graphics_buffer, game_state.test_zombie, game_state.camera, game_state.render_resources[game_state.test_zombie.render_id]);
+	for (Zombie* zombie : game_state.zombies)
+	{
+		render_entity(graphics_buffer, *zombie, game_state.camera, game_state.render_resources[zombie->render_id]);
+	}
 
 	for (Bullet* bullet : game_state.bullets)
 	{
