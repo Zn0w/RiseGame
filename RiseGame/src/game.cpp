@@ -63,7 +63,7 @@ static void create_bullet(vec2 position, vec2 velocity)
 static void create_zombie(vec2 position)
 {
 	Zombie* zombie = new Zombie;
-	zombie->velocity = {zombie->speed, zombie->speed};
+	//zombie->velocity = {zombie->speed, zombie->speed};
 	zombie->size = { 50, 50 };
 	zombie->render_id = 3;
 	zombie->position = position;
