@@ -7,7 +7,7 @@
 
 
 // game mechanics characteristics constants
-const float PLAYER_SPEED = 1.5f;
+const float PLAYER_SPEED = 1.0f;
 const int32_t PLAYER_RELOAD_DURATION = 10;
 const int32_t MAX_BULLET_DISTANCE = 50;
 const vec2 BULLET_SIZE = { 10, 10 };
@@ -25,6 +25,14 @@ struct Zombie : public Entity
 	float speed = 0.5f;
 };
 
+struct Bullet : public Entity
+{
+	int8_t distance;
+	int8_t distance_left;
+	float speed = 2.0f;
+};
+
+
 static void updateZombie(float time, Zombie* zombie, vec2 target)
 {
 	if (zombie->position.x > target.x)
@@ -40,16 +48,10 @@ static void updateZombie(float time, Zombie* zombie, vec2 target)
 	add(&zombie->position, zombie->velocity);
 }
 
-
-struct Bullet : public Entity
-{
-	int8_t distance;
-	int8_t distance_left;
-};
-
 static void update_bullet(float time, Bullet* bullet)
 {
-	add(&bullet->position, bullet->velocity);
+	vec2 vel_with_dt = { bullet->velocity.x * time, bullet->velocity.y * time };
+	add(&bullet->position, vel_with_dt);
 	bullet->distance_left--;
 }
 

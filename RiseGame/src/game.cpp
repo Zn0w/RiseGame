@@ -57,6 +57,8 @@ static void create_bullet(vec2 position, vec2 velocity)
 	bullet->render_id = 5;
 	bullet->size = BULLET_SIZE;
 	bullet->velocity = velocity;
+	bullet->velocity.x *= bullet->speed;
+	bullet->velocity.y *= bullet->speed;
 	game_state.bullets.push_back(bullet);
 }
 
@@ -183,17 +185,17 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
 	{
 		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { 0, -15 });
+			create_bullet(game_state.player.position, { 0, -1 });
 	}
 	if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
 		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { 0, 15 });
+			create_bullet(game_state.player.position, { 0, 1 });
 	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
 		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { -15, 0 });
+			create_bullet(game_state.player.position, { -1, 0 });
 	if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
 		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { 15, 0 });
+			create_bullet(game_state.player.position, { 1, 0 });
 
 	// Game update
 	// tiles update (only with player for now)
