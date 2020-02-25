@@ -170,8 +170,10 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	outputSound(sound_buffer, game_state->sample_volume, game_state->sample_hz);
 #endif
 
-
-	// Get player input
+	/********************************************************************************
+									GET PLAYER INPUT
+	*********************************************************************************/
+	
 	if (game_input->keyboard.keys[RG_W].is_down && !game_input->keyboard.keys[RG_W].was_down)
 		game_state.player.velocity.y += -game_state.player.speed * time;
 	else if (game_input->keyboard.keys[RG_S].is_down && !game_input->keyboard.keys[RG_S].was_down)
@@ -197,7 +199,9 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		if (game_state.player.reload == 0)
 			create_bullet(game_state.player.position, { 1, 0 });
 
-	// Game update
+	/********************************************************************************
+									GAME UPDATE
+	*********************************************************************************/
 	// tiles update (only with player for now)
 	for (int y = (game_state.player.position.y - game_state.player.size.y / 2) / game_state.tilemap.tile_size.y; y < map_height && y < (y + 2); y++)
 	{
@@ -216,14 +220,11 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 				
 				if (game_state.tile_types[game_state.tilemap.tiles[mempos]].update)
 					game_state.tile_types[game_state.tilemap.tiles[mempos]].update(&game_state.player, tile_pos_tl, tile_pos_br);
-				
-				//game_state.tilemap.tiles[mempos] = 1;	// leave a purple trail (test)
 			}
 		}
 	}
 
 	updatePlayer(time);
-	//updateZombie(time, &game_state.test_zombie.position, game_state.player.position, game_state.test_zombie.velocity);
 	for (int i = 0; i < game_state.zombies.size(); i++)
 	{
 		Zombie* zombie = game_state.zombies.at(i);
@@ -254,16 +255,17 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		}
 	}
 
-
-	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
 	link_camera(&game_state.camera, game_state.player, &game_state.tilemap);
 
-	// render game entities
+	/********************************************************************************
+									GAME RENDER
+	*********************************************************************************/
 
+	render_background(graphics_buffer, { 0.0f, 1.0f, 0.5f });
+	
 	render_tilemap(graphics_buffer, &game_state.tilemap, game_state.camera, game_state.render_resources);
 
 	render_entity(graphics_buffer, game_state.player, game_state.camera, game_state.render_resources[game_state.player.render_id]);
-	//render_entity(graphics_buffer, player, camera, render_resources[4].texture);
 
 	for (Zombie* zombie : game_state.zombies)
 	{
