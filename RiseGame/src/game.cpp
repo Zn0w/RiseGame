@@ -47,31 +47,6 @@ const uint32_t visible_tiles_x = 16;
 const uint32_t visible_tiles_y = 9;
 
 
-static void create_bullet(vec2 position, vec2 velocity)
-{
-	game_state.player.reload = PLAYER_RELOAD_DURATION;
-	Bullet* bullet = new Bullet;
-	bullet->position = position;
-	bullet->distance = MAX_BULLET_DISTANCE;
-	bullet->distance_left = bullet->distance;
-	bullet->render_id = 5;
-	bullet->size = BULLET_SIZE;
-	bullet->velocity = velocity;
-	bullet->velocity.x *= bullet->speed;
-	bullet->velocity.y *= bullet->speed;
-	game_state.bullets.push_back(bullet);
-}
-
-static void create_zombie(vec2 position)
-{
-	Zombie* zombie = new Zombie;
-	//zombie->velocity = {zombie->speed, zombie->speed};
-	zombie->size = { 50, 50 };
-	zombie->render_id = 3;
-	zombie->position = position;
-	game_state.zombies.push_back(zombie);
-}
-
 static vec2 tiles_to_pixels(int32_t x, int32_t y)
 {
 	return { x * game_state.tilemap.tile_size.x, y * game_state.tilemap.tile_size.y };
@@ -100,10 +75,6 @@ void game_init()
 	game_state.player.render_id = 2;
 
 
-	create_zombie({ 1000, 500 });
-	create_zombie({ 2000, 800 });
-	create_zombie({ 2500, 300 });
-
 	game_state.camera.width = visible_tiles_x * game_state.tilemap.tile_size.x;
 	game_state.camera.height = visible_tiles_y * game_state.tilemap.tile_size.y;
 	link_camera(&game_state.camera, game_state.player, &game_state.tilemap);
@@ -119,13 +90,6 @@ static void updatePlayer(float time)
 
 	if (game_state.player.reload)
 		game_state.player.reload--;
-
-	// slow collision test for zombies (for the test gameplay)
-	for (Zombie* zombie : game_state.zombies)
-	{
-		if (collides(game_state.player, *zombie))
-			game_state.pause = 10;
-	}
 }
 
 void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphics_buffer, SoundBuffer* sound_buffer, GameInput* game_input)
@@ -184,21 +148,6 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	else if (game_input->keyboard.keys[RG_D].is_down && !game_input->keyboard.keys[RG_D].was_down)
 		game_state.player.velocity.x += game_state.player.speed * time;
 
-	if (game_input->keyboard.keys[RG_UP].is_down && !game_input->keyboard.keys[RG_UP].was_down)
-	{
-		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { 0, -1 });
-	}
-	if (game_input->keyboard.keys[RG_DOWN].is_down && !game_input->keyboard.keys[RG_DOWN].was_down)
-		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { 0, 1 });
-	if (game_input->keyboard.keys[RG_LEFT].is_down && !game_input->keyboard.keys[RG_LEFT].was_down)
-		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { -1, 0 });
-	if (game_input->keyboard.keys[RG_RIGHT].is_down && !game_input->keyboard.keys[RG_RIGHT].was_down)
-		if (game_state.player.reload == 0)
-			create_bullet(game_state.player.position, { 1, 0 });
-
 	/********************************************************************************
 									GAME UPDATE
 	*********************************************************************************/
@@ -225,35 +174,6 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	}
 
 	updatePlayer(time);
-	for (int i = 0; i < game_state.zombies.size(); i++)
-	{
-		Zombie* zombie = game_state.zombies.at(i);
-		updateZombie(time, zombie, game_state.player.position);
-		
-		// slow collision test for bullets (for the test gameplay)
-		for (Bullet* bullet : game_state.bullets)
-		{
-			if (collides(*zombie, *bullet))
-				zombie->hp--;
-		}
-
-		if (zombie->hp <= 0)
-		{
-			delete zombie;
-			game_state.zombies.erase(game_state.zombies.begin() + i);
-		}
-	}
-
-	for (int i = 0; i < game_state.bullets.size(); i++)
-	{
-		Bullet* bullet = game_state.bullets.at(i);
-		update_bullet(time, bullet);
-		if (bullet->distance_left == 0)
-		{
-			delete bullet;
-			game_state.bullets.erase(game_state.bullets.begin() + i);
-		}
-	}
 
 	link_camera(&game_state.camera, game_state.player, &game_state.tilemap);
 
@@ -266,22 +186,6 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 	render_tilemap(graphics_buffer, &game_state.tilemap, game_state.camera, game_state.render_resources);
 
 	render_entity(graphics_buffer, game_state.player, game_state.camera, game_state.render_resources[game_state.player.render_id]);
-
-	for (Zombie* zombie : game_state.zombies)
-	{
-		render_entity(graphics_buffer, *zombie, game_state.camera, game_state.render_resources[zombie->render_id]);
-	}
-
-	for (Bullet* bullet : game_state.bullets)
-	{
-		render_entity(graphics_buffer, *bullet, game_state.camera, game_state.render_resources[bullet->render_id]);
-	}
-
-	if (game_state.pause)
-	{
-		render_rectangle(graphics_buffer, 0, 0, screen_width, screen_height, {1.0f, 0.0f, 0.0f});
-		game_state.pause--;
-	}
 
 	// test texture render
 	//char texture_path[] = "test/assets/hero_3.bmp";

@@ -26,9 +26,6 @@ struct GameState
 	//int sample_hz;
 
 	Player player;
-	std::vector<Zombie*> zombies;
-	std::vector<Bullet*> bullets;
-	int8_t pause = 0;
 	
 	RenderResource render_resources[6] = {
 		{ {},{ 1.0f, 1.0f, 0.0f }, 0 },{ {},{ 1.0f, 0.0f, 1.0f }, 1 },{ {},{ 0.2f, 0.2f, 0.8f }, 2 },{ {},{ 0.2f, 0.8f, 0.4f }, 3 },
