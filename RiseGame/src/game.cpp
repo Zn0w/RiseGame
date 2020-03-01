@@ -82,11 +82,16 @@ void game_init()
 	game_state.tile_types[1].update = &wall_tile_update;
 }
 
-static void updatePlayer(float time)
+static void updatePlayer(float time, vec2 velocity)
 {
-	add(&game_state.player.position, game_state.player.velocity);
+	// fix speed for diagonal movement
+	if (velocity.x == velocity.y)
+	{
+		// 0.70710678118 = 1 / sqrt(2)
+		velocity = { (int32_t) (velocity.x * 0.70710678118f), (int32_t) (velocity.y * 0.70710678118f) };
+	}
 	
-	game_state.player.velocity = {0, 0};
+	add(&game_state.player.position, velocity);
 
 	if (game_state.player.reload)
 		game_state.player.reload--;
@@ -138,15 +143,17 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 									GET PLAYER INPUT
 	*********************************************************************************/
 	
+	vec2 new_velocity = { 0, 0 };
+	
 	if (game_input->keyboard.keys[RG_W].is_down && !game_input->keyboard.keys[RG_W].was_down)
-		game_state.player.velocity.y += -game_state.player.speed * time;
+		new_velocity.y = -game_state.player.speed * time;
 	else if (game_input->keyboard.keys[RG_S].is_down && !game_input->keyboard.keys[RG_S].was_down)
-		game_state.player.velocity.y += game_state.player.speed * time;
+		new_velocity.y = game_state.player.speed * time;
 
 	if (game_input->keyboard.keys[RG_A].is_down && !game_input->keyboard.keys[RG_A].was_down)
-		game_state.player.velocity.x += -game_state.player.speed * time;
+		new_velocity.x = -game_state.player.speed * time;
 	else if (game_input->keyboard.keys[RG_D].is_down && !game_input->keyboard.keys[RG_D].was_down)
-		game_state.player.velocity.x += game_state.player.speed * time;
+		new_velocity.x = game_state.player.speed * time;
 
 	/********************************************************************************
 									GAME UPDATE
@@ -173,7 +180,7 @@ void game_update_and_render(float time, GameMemory* memory, BitmapBuffer* graphi
 		}
 	}
 
-	updatePlayer(time);
+	updatePlayer(time, new_velocity);
 
 	link_camera(&game_state.camera, game_state.player, &game_state.tilemap);
 
