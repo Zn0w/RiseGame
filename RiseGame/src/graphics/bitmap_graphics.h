@@ -33,9 +33,9 @@ static int bytes_per_pixel = 4;
 
 static void render_background(BitmapBuffer* buffer, RGBColor color)
 {
-	uint32_t raw_color = (roundFloatToUInt32(color.red * 255.0f) << 16) |
-		(roundFloatToUInt32(color.green * 255.0f) << 8) |
-		(roundFloatToUInt32(color.blue * 255.0f) << 0);
+	uint32_t raw_color = (round_float_to_uint32(color.red * 255.0f) << 16) |
+		(round_float_to_uint32(color.green * 255.0f) << 8) |
+		(round_float_to_uint32(color.blue * 255.0f) << 0);
 	
 	uint8_t* row = (uint8_t*)buffer->memory;
 	for (int y = 0; y < buffer->height; y++)
@@ -63,9 +63,9 @@ static void render_rectangle(BitmapBuffer* buffer, int32_t min_x, int32_t min_y,
 	if (max_y > buffer->height)
 		max_y = buffer->height;
 
-	uint32_t raw_color = (roundFloatToUInt32(color.red * 255.0f) << 16) |
-						 (roundFloatToUInt32(color.green * 255.0f) << 8) |
-						 (roundFloatToUInt32(color.blue * 255.0f) << 0);
+	uint32_t raw_color = (round_float_to_uint32(color.red * 255.0f) << 16) |
+						 (round_float_to_uint32(color.green * 255.0f) << 8) |
+						 (round_float_to_uint32(color.blue * 255.0f) << 0);
 	
 	uint8_t* row = (uint8_t*)buffer->memory + min_x * bytes_per_pixel + min_y * buffer->pitch;
 	for (int y = min_y; y < max_y; y++)
