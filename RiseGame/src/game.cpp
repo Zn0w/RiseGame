@@ -85,10 +85,10 @@ void game_init()
 static void updatePlayer(float time, vec2 velocity)
 {
 	// fix speed for diagonal movement
-	if (velocity.x == velocity.y)
+	if ((velocity.x != 0) && (velocity.y != 0))
 	{
 		// 0.70710678118 = 1 / sqrt(2)
-		velocity = { (int32_t) (velocity.x * 0.70710678118f), (int32_t) (velocity.y * 0.70710678118f) };
+		velocity = { round_float_to_int32((float)velocity.x * 0.70710678118f), round_float_to_int32((float)velocity.y * 0.70710678118f) };
 	}
 	
 	add(&game_state.player.position, velocity);

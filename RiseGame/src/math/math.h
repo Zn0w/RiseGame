@@ -74,3 +74,8 @@ static uint32_t round_float_to_uint32(float value)
 {
 	return (uint32_t)(value + 0.5f);
 }
+
+static int32_t round_float_to_int32(float value)
+{
+	return (int32_t)(value + 0.5f);
+}
